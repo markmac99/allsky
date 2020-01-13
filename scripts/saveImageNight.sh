@@ -38,26 +38,27 @@ cp $IMAGE_TO_USE "liveview-$FILENAME.$EXTENSION"
 cp $IMAGE_TO_USE "images/$CURRENT/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION"
 
 # Create a thumbnail of the image for faster load in web GUI
-if identify $IMAGE_TO_USE >/dev/null 2>&1; then
-	convert "$IMAGE_TO_USE" -resize 100x75 "images/$CURRENT/thumbnails/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION";
-fi
+# -- not doing this for my camera
+#if identify $IMAGE_TO_USE >/dev/null 2>&1; then
+#	convert "$IMAGE_TO_USE" -resize 100x75 "images/$CURRENT/thumbnails/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION";
+#fi
 
-echo -e "Saving $FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION\n" >> log.txt
+echo -e "Saving $FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION\n"
 
 # If upload is true, create a smaller version of the image and upload it
 if [ "$UPLOAD_IMG" = true ] ; then
-	echo -e "Resizing \n"
-	echo -e "Resizing $FULL_FILENAME \n" >> log.txt
+	echo -e "Resizing $FULL_FILENAME \n"
 
 	# Create a thumbnail for live view
 	# Here's what I use with my ASI224MC
-	convert "$IMAGE_TO_USE" -resize 962x720 -gravity East -chop 2x0 "$FILENAME-resize.$EXTENSION";
+	#convert "$IMAGE_TO_USE" -resize 962x720 -gravity East -chop 2x0 "$FILENAME-resize.$EXTENSION";
 	# Here's what I use with my ASI185MC (larger sensor so I crop the black around the image)
 	#convert "$IMAGE_TO_USE" -resize 962x720 -gravity Center -crop 680x720+40+0 +repage "$FILENAME-resize.$EXTENSION";
 
-	echo -e "Uploading \n"
-	echo -e "Uploading $FILENAME-resize.$EXTENSION \n" >> log.txt
-	lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20; put $FILENAME-resize.$EXTENSION; bye" &
+	convert "$IMAGE_TO_USE" -resize 1080x720\! "$FILENAME-resize.$EXTENSION";
+
+	echo -e "Uploading  $FILENAME-resize.$EXTENSION \n"
+	timeout 5 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST" -e "set net:max-retries 1; set net:timeout 20; cd "$IMGDIR"; put $FILENAME-resize.$EXTENSION; bye" &
 fi
 
 

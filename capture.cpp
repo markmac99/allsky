@@ -34,7 +34,7 @@ char nameCnt[128];
 char const *fileName = "image.jpg";
 std::vector<int> compression_parameters;
 bool bMain = true, bDisplay = false;
-std::string dayOrNight;
+std::string dayOrNight="DAY";
 
 bool bSaveRun = false, bSavingImg = false;
 pthread_mutex_t mtx_SaveImg;
@@ -145,8 +145,10 @@ void calculateDayOrNight(const char *latitude, const char *longitude, const char
 {
     char sunwaitCommand[128];
     sprintf(sunwaitCommand, "sunwait poll exit set angle %s %s %s", angle, latitude, longitude);
+    //std::cout << "daynornight was " << dayOrNight << std::endl;
     dayOrNight = exec(sunwaitCommand);
     dayOrNight.erase(std::remove(dayOrNight.begin(), dayOrNight.end(), '\n'), dayOrNight.end());
+    //std::cout << "daynornight now  " << dayOrNight << std::endl;
 }
 
 void writeToLog(int val)
@@ -220,6 +222,7 @@ int main(int argc, char *argv[])
     void *retval;
     bool endOfNight    = false;
     pthread_t hthdSave = 0;
+    bool isIPCam       = false;
 
     //-------------------------------------------------------------------------------------------------------
     //-------------------------------------------------------------------------------------------------------
@@ -449,6 +452,10 @@ int main(int argc, char *argv[])
                 daytimeCapture = atoi(argv[i + 1]);
                 i++;
             }
+            else if (strcmp(argv[i], "-ipcam") == 0)
+            {
+                isIPCam = true;
+            }
         }
     }
 
@@ -507,6 +514,7 @@ int main(int argc, char *argv[])
                "placement \n");
         printf(" -darkframe                         - Set to 1 to disable time and text overlay \n");
         printf(" -showDetails                       - Set to 1 to display the metadata on the image \n");
+        printf(" -ipcam                             - use ip camera instead of ASI\n");
 
         printf("%sUsage:\n", KRED);
         printf(" ./capture -width 640 -height 480 -exposure 5000000 -gamma 50 -type 1 -bin 1 -filename "
@@ -534,105 +542,113 @@ int main(int argc, char *argv[])
     }
     compression_parameters.push_back(quality);
 
-    int numDevices = ASIGetNumOfConnectedCameras();
-    if (numDevices <= 0)
-    {
-        printf("\nNo Connected Camera...\n");
-        width  = 1; //Set to 1 when NO Cameras are connected to avoid error: OpenCV Error: Insufficient memory
-        height = 1; //Set to 1 when NO Cameras are connected to avoid error: OpenCV Error: Insufficient memory
-    }
-    else
-    {
-        printf("\nListing Attached Cameras:\n");
-    }
-
-    ASI_CAMERA_INFO ASICameraInfo;
-
-    for (i = 0; i < numDevices; i++)
-    {
-        ASIGetCameraProperty(&ASICameraInfo, i);
-        printf("- %d %s\n", i, ASICameraInfo.Name);
-    }
-
-    if (ASIOpenCamera(CamNum) != ASI_SUCCESS)
-    {
-        printf("Open Camera ERROR, Check that you have root permissions!\n");
-    }
-
-    printf("\n%s Information:\n", ASICameraInfo.Name);
-    int iMaxWidth, iMaxHeight;
-    iMaxWidth  = ASICameraInfo.MaxWidth;
-    iMaxHeight = ASICameraInfo.MaxHeight;
-    printf("- Resolution:%dx%d\n", iMaxWidth, iMaxHeight);
-    if (ASICameraInfo.IsColorCam)
-    {
-        printf("- Color Camera: bayer pattern:%s\n", bayer[ASICameraInfo.BayerPattern]);
-    }
-    else
-    {
-        printf("- Mono camera\n");
-    }
-
-    if (ASIInitCamera(CamNum) == ASI_SUCCESS)
-    {
-        printf("- Initialise Camera OK\n");
-    }
-    else
-    {
-        printf("- Initialise Camera ERROR\n");
-    }
-
-    ASI_CONTROL_CAPS ControlCaps;
-    int iNumOfCtrl = 0;
-    ASIGetNumOfControls(CamNum, &iNumOfCtrl);
-    for (i = 0; i < iNumOfCtrl; i++)
-    {
-        ASIGetControlCaps(CamNum, i, &ControlCaps);
-        //printf("- %s\n", ControlCaps.Name);
-    }
-
-    if (width == 0 || height == 0)
-    {
-        width  = iMaxWidth;
-        height = iMaxHeight;
-    }
-
+    const char *sType;
     long ltemp     = 0;
     ASI_BOOL bAuto = ASI_FALSE;
-    ASIGetControlValue(CamNum, ASI_TEMPERATURE, &ltemp, &bAuto);
-    printf("- Sensor temperature:%02f\n", (float)ltemp / 10.0);
-
-    // Adjusting variables for chosen binning
-    height    = height / bin;
-    width     = width / bin;
-    iTextX    = iTextX / bin;
-    iTextY    = iTextY / bin;
-    fontsize  = fontsize / bin;
-    linewidth = linewidth / bin;
-
-    const char *sType;
-    if (Image_type == ASI_IMG_RAW16)
+    if(!isIPCam)
     {
-        sType = "ASI_IMG_RAW16";
-        pRgb.create(cvSize(width, height), CV_16UC1);
-    }
-    else if (Image_type == ASI_IMG_RGB24)
-    {
-        sType = "ASI_IMG_RGB24";
-        pRgb.create(cvSize(width, height), CV_8UC3);
+        int numDevices = ASIGetNumOfConnectedCameras();
+        if (numDevices <= 0)
+        {
+            printf("\nNo Connected Camera...\n");
+            width  = 1; //Set to 1 when NO Cameras are connected to avoid error: OpenCV Error: Insufficient memory
+            height = 1; //Set to 1 when NO Cameras are connected to avoid error: OpenCV Error: Insufficient memory
+        }
+        else
+        {
+            printf("\nListing Attached Cameras:\n");
+        }
+        
+        ASI_CAMERA_INFO ASICameraInfo;
+
+        for (i = 0; i < numDevices; i++)
+        {
+            ASIGetCameraProperty(&ASICameraInfo, i);
+            printf("- %d %s\n", i, ASICameraInfo.Name);
+        }
+
+        if (ASIOpenCamera(CamNum) != ASI_SUCCESS)
+        {
+            printf("Open Camera ERROR, Check that you have root permissions!\n");
+        }
+
+        printf("\n%s Information:\n", ASICameraInfo.Name);
+        int iMaxWidth, iMaxHeight;
+        iMaxWidth  = ASICameraInfo.MaxWidth;
+        iMaxHeight = ASICameraInfo.MaxHeight;
+        printf("- Resolution:%dx%d\n", iMaxWidth, iMaxHeight);
+        if (ASICameraInfo.IsColorCam)
+        {
+            printf("- Color Camera: bayer pattern:%s\n", bayer[ASICameraInfo.BayerPattern]);
+        }
+        else
+        {
+            printf("- Mono camera\n");
+        }
+
+        if (ASIInitCamera(CamNum) == ASI_SUCCESS)
+        {
+            printf("- Initialise Camera OK\n");
+        }
+        else
+        {
+            printf("- Initialise Camera ERROR\n");
+        }
+
+        ASI_CONTROL_CAPS ControlCaps;
+        int iNumOfCtrl = 0;
+        ASIGetNumOfControls(CamNum, &iNumOfCtrl);
+        for (i = 0; i < iNumOfCtrl; i++)
+        {
+            ASIGetControlCaps(CamNum, i, &ControlCaps);
+            //printf("- %s\n", ControlCaps.Name);
+        }
+
+        if (width == 0 || height == 0)
+        {
+            width  = iMaxWidth;
+            height = iMaxHeight;
+        }
+
+        ASIGetControlValue(CamNum, ASI_TEMPERATURE, &ltemp, &bAuto);
+        printf("- Sensor temperature:%02f\n", (float)ltemp / 10.0);
+
+        // Adjusting variables for chosen binning
+        height    = height / bin;
+        width     = width / bin;
+        iTextX    = iTextX / bin;
+        iTextY    = iTextY / bin;
+        fontsize  = fontsize / bin;
+        linewidth = linewidth / bin;
+
+        if (Image_type == ASI_IMG_RAW16)
+        {
+            sType = "ASI_IMG_RAW16";
+            pRgb.create(cvSize(width, height), CV_16UC1);
+        }
+        else if (Image_type == ASI_IMG_RGB24)
+        {
+            sType = "ASI_IMG_RGB24";
+            pRgb.create(cvSize(width, height), CV_8UC3);
+        }
+        else
+        {
+            sType = "ASI_IMG_RAW8";
+            pRgb.create(cvSize(width, height), CV_8UC1);
+        }
+
+        if (Image_type != ASI_IMG_RGB24 && Image_type != ASI_IMG_RAW16)
+        {
+            iStrLen     = strlen(buf);
+            CvRect rect = cvRect(iTextX, iTextY - 15, iStrLen * 11, 20);
+            cv::Mat roi = pRgb(rect);
+            roi.setTo(cv::Scalar(180, 180, 180));
+        }
     }
     else
     {
-        sType = "ASI_IMG_RAW8";
-        pRgb.create(cvSize(width, height), CV_8UC1);
-    }
-
-    if (Image_type != ASI_IMG_RGB24 && Image_type != ASI_IMG_RAW16)
-    {
-        iStrLen     = strlen(buf);
-        CvRect rect = cvRect(iTextX, iTextY - 15, iStrLen * 11, 20);
-        cv::Mat roi = pRgb(rect);
-        roi.setTo(cv::Scalar(180, 180, 180));
+        printf("Using IP Camera");
+        sType = "IP Camera";
     }
 
     //-------------------------------------------------------------------------------------------------------
@@ -643,7 +659,10 @@ int main(int argc, char *argv[])
     printf(" Image Type: %s\n", sType);
     printf(" Resolution: %dx%d \n", width, height);
     printf(" Quality: %d \n", quality);
-    printf(" Exposure: %1.0fms\n", round(asiExposure / 1000));
+    if(!isIPCam)
+        printf(" Exposure: %1.0fms\n", round(asiExposure / 1000));
+    else
+        printf(" Intra-shot Delay: %1.0fms\n", round(asiExposure / 1000));
     printf(" Max Exposure: %dms\n", asiMaxExposure);
     printf(" Auto Exposure: %d\n", asiAutoExposure);
     printf(" Gain: %d\n", asiGain);
@@ -676,23 +695,26 @@ int main(int argc, char *argv[])
     printf(" Darkframe: %d\n", darkframe);
     printf(" Show Details: %d\n", showDetails);
     printf("%s", KNRM);
+    usleep(10000);
 
-    ASISetROIFormat(CamNum, width, height, bin, (ASI_IMG_TYPE)Image_type);
+    if(!isIPCam)
+    {
+        ASISetROIFormat(CamNum, width, height, bin, (ASI_IMG_TYPE)Image_type);
 
-    //-------------------------------------------------------------------------------------------------------
-    //-------------------------------------------------------------------------------------------------------
-    ASISetControlValue(CamNum, ASI_TEMPERATURE, 50 * 1000, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_BANDWIDTHOVERLOAD, asiBandwidth, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_EXPOSURE, asiExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_AUTO_MAX_EXP, asiMaxExposure, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_AUTO_MAX_GAIN, asiMaxGain, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_WB_R, asiWBR, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_WB_B, asiWBB, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_GAMMA, asiGamma, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_BRIGHTNESS, asiBrightness, ASI_FALSE);
-    ASISetControlValue(CamNum, ASI_FLIP, asiFlip, ASI_FALSE);
-
+        //-------------------------------------------------------------------------------------------------------
+        //-------------------------------------------------------------------------------------------------------
+        ASISetControlValue(CamNum, ASI_TEMPERATURE, 50 * 1000, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_BANDWIDTHOVERLOAD, asiBandwidth, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_EXPOSURE, asiExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_AUTO_MAX_EXP, asiMaxExposure, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_AUTO_MAX_GAIN, asiMaxGain, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_WB_R, asiWBR, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_WB_B, asiWBB, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_GAMMA, asiGamma, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_BRIGHTNESS, asiBrightness, ASI_FALSE);
+        ASISetControlValue(CamNum, ASI_FLIP, asiFlip, ASI_FALSE);
+    }
     pthread_t thread_display = 0;
     if (preview == 1)
     {
@@ -748,139 +770,165 @@ int main(int argc, char *argv[])
                 exp_ms         = 32;
                 useDelay       = daytimeDelay;
                 captureTimeout = exp_ms <= 100 ? 200 : exp_ms * 2;
-                ASISetControlValue(CamNum, ASI_EXPOSURE, exp_ms, ASI_TRUE);
-                ASISetControlValue(CamNum, ASI_GAIN, 0, ASI_FALSE);
+                if(!isIPCam)
+                {
+                    ASISetControlValue(CamNum, ASI_EXPOSURE, exp_ms, ASI_TRUE);
+                    ASISetControlValue(CamNum, ASI_GAIN, 0, ASI_FALSE);
+                }
             }
         }
-        else if (dayOrNight == "NIGHT")
+        else //if (dayOrNight == "NIGHT")
         {
-            // Setup the night time capture parameters
-            if (asiAutoExposure == 1)
+            if(isIPCam)
             {
-                printf("Saving auto exposed images every %d ms\n\n", delay);
+                useDelay = asiExposure/1000;
+                printf("Saving auto exposed images every %d s\n\n", useDelay/1000);
             }
             else
             {
-                printf("Saving %ds exposure images every %d ms\n\n", (int)round(currentExposure / 1000000), delay);
+                // Setup the night time capture parameters
+                if (asiAutoExposure == 1)
+                {
+                    printf("Saving auto exposed images every %d ms\n\n", delay);
+                }
+                else
+                {
+                    printf("Saving %ds exposure images every %d ms\n\n", (int)round(currentExposure / 1000000), delay);
+                }
+                // Set exposure value for night time capture
+                ASISetControlValue(CamNum, ASI_EXPOSURE, currentExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
+                ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
             }
-            // Set exposure value for night time capture
-            ASISetControlValue(CamNum, ASI_EXPOSURE, currentExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
-            ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
         }
         printf("Press Ctrl+C to stop\n\n");
 
         if (needCapture)
         {
-            ASIStartVideoCapture(CamNum);
+            if(!isIPCam)
+                ASIStartVideoCapture(CamNum);
             while (bMain && lastDayOrNight == dayOrNight)
             {
-                if (ASIGetVideoData(CamNum, pRgb.data, pRgb.step[0] * pRgb.rows, captureTimeout) == ASI_SUCCESS)
+                if(!isIPCam)
                 {
-                    // Read current camera parameters
-                    ASIGetControlValue(CamNum, ASI_EXPOSURE, &autoExp, &bAuto);
-                    ASIGetControlValue(CamNum, ASI_GAIN, &autoGain, &bAuto);
-                    ASIGetControlValue(CamNum, ASI_TEMPERATURE, &ltemp, &bAuto);
-
-                    // Get Current Time for overlay
-                    sprintf(bufTime, "%s", getTime());
-
-                    if (darkframe != 1)
+                    if (ASIGetVideoData(CamNum, pRgb.data, pRgb.step[0] * pRgb.rows, captureTimeout) == ASI_SUCCESS)
                     {
-                        // If darkframe mode is off, add overlay text to the image
-                        int iYOffset = 0;
-                        //cvText(pRgb, ImgText, iTextX, iTextY+(iYOffset/bin), fontsize, linewidth, linetype[linenumber], fontname[fontnumber], fontcolor, Image_type);
-                        //iYOffset+=30;
-                        if (time == 1)
-                        {
-                            cvText(pRgb, bufTime, iTextX, iTextY + (iYOffset / bin), fontsize, linewidth,
-                                   linetype[linenumber], fontname[fontnumber], fontcolor, Image_type, outlinefont);
-                            iYOffset += 30;
-                        }
-
-                        if (showDetails == 1)
-                        {
-                            sprintf(bufTemp, "Sensor %.1fC", (float)ltemp / 10);
-                            cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
-                                   linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
-                            iYOffset += 30;
-                            sprintf(bufTemp, "Exposure %.3f s", (float)autoExp / 1000000);
-                            cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
-                                   linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
-                            iYOffset += 30;
-                            sprintf(bufTemp, "Gain %d", (int)autoGain);
-                            cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
-                                   linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
-                            iYOffset += 30;
-                        }
-                    }
-                    printf("Exposure value: %.0f µs\n", (float)autoExp);
-                    if (asiAutoExposure == 1)
-                    {
-                        // Retrieve the current Exposure for smooth transition to night time
-                        // as long as auto-exposure is enabled during night time
-                        currentExposure = autoExp;
-                    }
-
-                    // Save the image
-                    printf("Saving...");
-                    printf(bufTime);
-                    printf("\n");
-                    if (!bSavingImg)
-                    {
-                        pthread_mutex_lock(&mtx_SaveImg);
-                        pthread_cond_signal(&cond_SatrtSave);
-                        pthread_mutex_unlock(&mtx_SaveImg);
-                    }
-
-                    if (asiAutoGain == 1 && dayOrNight == "NIGHT")
-                    {
+                        // Read current camera parameters
+                        ASIGetControlValue(CamNum, ASI_EXPOSURE, &autoExp, &bAuto);
                         ASIGetControlValue(CamNum, ASI_GAIN, &autoGain, &bAuto);
-                        printf("Auto Gain value: %d\n", (int)autoGain);
-                        writeToLog(autoGain);
-                    }
+                        ASIGetControlValue(CamNum, ASI_TEMPERATURE, &ltemp, &bAuto);
 
-                    if (asiAutoExposure == 1)
-                    {
-                        printf("Auto Exposure value: %d ms\n", (int)round(autoExp / 1000));
-                        writeToLog(autoExp);
-                        if (dayOrNight == "NIGHT")
+                        // Get Current Time for overlay
+                        sprintf(bufTime, "%s", getTime());
+
+                        if (darkframe != 1)
                         {
-                            ASIGetControlValue(CamNum, ASI_EXPOSURE, &autoExp, &bAuto);
+                            // If darkframe mode is off, add overlay text to the image
+                            int iYOffset = 0;
+                            //cvText(pRgb, ImgText, iTextX, iTextY+(iYOffset/bin), fontsize, linewidth, linetype[linenumber], fontname[fontnumber], fontcolor, Image_type);
+                            //iYOffset+=30;
+                            if (time == 1)
+                            {
+                                cvText(pRgb, bufTime, iTextX, iTextY + (iYOffset / bin), fontsize, linewidth,
+                                    linetype[linenumber], fontname[fontnumber], fontcolor, Image_type, outlinefont);
+                                iYOffset += 30;
+                            }
+
+                            if (showDetails == 1)
+                            {
+                                sprintf(bufTemp, "Sensor %.1fC", (float)ltemp / 10);
+                                cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
+                                    linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
+                                iYOffset += 30;
+                                sprintf(bufTemp, "Exposure %.3f s", (float)autoExp / 1000000);
+                                cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
+                                    linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
+                                iYOffset += 30;
+                                sprintf(bufTemp, "Gain %d", (int)autoGain);
+                                cvText(pRgb, bufTemp, iTextX, iTextY + (iYOffset / bin), fontsize * 0.8, linewidth,
+                                    linetype[linenumber], fontname[fontnumber], smallFontcolor, Image_type, outlinefont);
+                                iYOffset += 30;
+                            }
                         }
-                        else
+                        printf("Exposure value: %.0f µs\n", (float)autoExp);
+                        if (asiAutoExposure == 1)
                         {
+                            // Retrieve the current Exposure for smooth transition to night time
+                            // as long as auto-exposure is enabled during night time
                             currentExposure = autoExp;
                         }
 
-                        // Delay applied before next exposure
-                        if (autoExp < asiMaxExposure * 1000 && dayOrNight == "NIGHT")
+                        // Save the image
+                        printf("Saving...");
+                        printf(bufTime);
+                        printf("\n");
+                        if (!bSavingImg)
                         {
-                            // if using auto-exposure and the actual exposure is less than the max,
-                            // we still wait until we reach maxexposure. This is important for a
-                            // constant frame rate during timelapse generation
-                            printf("Sleeping: %d ms\n", asiMaxExposure - (int)(autoExp / 1000) + useDelay);
-                            usleep((asiMaxExposure * 1000 - autoExp) + useDelay * 1000);
+                            pthread_mutex_lock(&mtx_SaveImg);
+                            pthread_cond_signal(&cond_SatrtSave);
+                            pthread_mutex_unlock(&mtx_SaveImg);
+                        }
+
+                        if (asiAutoGain == 1 && dayOrNight == "NIGHT")
+                        {
+                            ASIGetControlValue(CamNum, ASI_GAIN, &autoGain, &bAuto);
+                            printf("Auto Gain value: %d\n", (int)autoGain);
+                            writeToLog(autoGain);
+                        }
+
+                        if (asiAutoExposure == 1)
+                        {
+                            printf("Auto Exposure value: %d ms\n", (int)round(autoExp / 1000));
+                            writeToLog(autoExp);
+                            if (dayOrNight == "NIGHT")
+                            {
+                                ASIGetControlValue(CamNum, ASI_EXPOSURE, &autoExp, &bAuto);
+                            }
+                            else
+                            {
+                                currentExposure = autoExp;
+                            }
+
+                            // Delay applied before next exposure
+                            if (autoExp < asiMaxExposure * 1000 && dayOrNight == "NIGHT")
+                            {
+                                // if using auto-exposure and the actual exposure is less than the max,
+                                // we still wait until we reach maxexposure. This is important for a
+                                // constant frame rate during timelapse generation
+                                printf("Sleeping: %d ms\n", asiMaxExposure - (int)(autoExp / 1000) + useDelay);
+                                usleep((asiMaxExposure * 1000 - autoExp) + useDelay * 1000);
+                            }
+                            else
+                            {
+                                std::cout << "sleeping for " << useDelay << " ms" << std::endl;
+                                usleep(useDelay * 1000);
+                            }
                         }
                         else
                         {
                             usleep(useDelay * 1000);
                         }
+                        calculateDayOrNight(latitude, longitude, angle);
                     }
-                    else
-                    {
-                        usleep(useDelay * 1000);
-                    }
+                }
+                else // its an IP Camera
+                {
+                    std::string cmd = "scripts/getIPCamImage.sh " + dayOrNight;
+                    system(cmd.c_str());
+                    usleep(useDelay*1000);
                     calculateDayOrNight(latitude, longitude, angle);
+                    //std::cout << dayOrNight << std::endl;
                 }
             }
             if (lastDayOrNight == "NIGHT")
             {
                 endOfNight = true;
             }
-            ASIStopVideoCapture(CamNum);
+            if(!isIPCam)
+                ASIStopVideoCapture(CamNum);
         }
     }
-    ASICloseCamera(CamNum);
+    if(!isIPCam)
+        ASICloseCamera(CamNum);
 
     if (bDisplay)
     {

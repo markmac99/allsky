@@ -4,9 +4,9 @@ source /home/pi/allsky/config.sh
 # TODO Needs fixing when civil twilight happens after midnight
 cd /home/pi/allsky/scripts
 
-latitude=60.7N
-longitude=135.02W
-timezone=-0700
+latitude=51.88N
+longitude=1.31W
+timezone=-000
 streamDaytime=false
 
 if [[ $DAYTIME == "1" ]] ; then
@@ -22,4 +22,4 @@ echo \"sunset\": \"$today"T"$timeNoZone":00.000$timezone"\", >> data.json
 echo \"streamDaytime\": \"$streamDaytime\" >> data.json
 echo } >> data.json
 echo "Uploading data.json"
-lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20; put data.json; bye"
+timeout 10 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20; put data.json; bye"

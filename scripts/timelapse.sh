@@ -26,6 +26,7 @@ ffmpeg -y -f image2 -r 25 -i images/$1/sequence/%04d.$EXTENSION -vcodec libx264 
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
 	lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$MP4DIR" -e "set net:max-retries 1; put images/$1/allsky-$1.mp4; bye"
+  python /home/pi/allsky/scripts/sendToYoutube.py "Timelapse for $1" /home/pi/allsky/images/$1/allsky-$1.mp4
 fi
 
 echo -en "* ${GREEN}Deleting sequence${NC}\n"

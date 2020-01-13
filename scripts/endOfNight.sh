@@ -3,7 +3,8 @@ source /home/pi/allsky/config.sh
 source /home/pi/allsky/scripts/filename.sh
 
 cd  /home/pi/allsky/scripts
-LAST_NIGHT=$(date -d '12 hours ago' +'%Y%m%d')
+LAST_NIGHT=$(date -d '17 hours ago' +'%Y%m%d')
+#LAST_NIGHT=$(date -d '1 days ago' +'%Y%m%d')
 
 # Post end of night data. This includes next twilight time
 if [[ $POST_END_OF_NIGHT_DATA == "true" ]]; then
@@ -19,7 +20,7 @@ fi
 # ./removeBadImages.sh /home/pi/allsky/images/$LAST_NIGHT/  
 
 # Generate keogram from collected images
-if [[ $KEOGRAM == "true" ]]; then
+if [[ $KEOGRAM == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg ]]; then
         echo -e "Generating Keogram\n"
 	mkdir -p /home/pi/allsky/images/$LAST_NIGHT/keogram/
         ../keogram /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION /home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg
@@ -32,10 +33,12 @@ if [[ $KEOGRAM == "true" ]]; then
 fi
 
 # Generate startrails from collected images. Treshold set to 0.1 by default in config.sh to avoid stacking over-exposed images
-if [[ $STARTRAILS == "true" ]]; then
+if [[ $STARTRAILS == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg ]]; then
         echo -e "Generating Startrails\n"
 	mkdir -p /home/pi/allsky/images/$LAST_NIGHT/startrails/
         ../startrails /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION $BRIGHTNESS_THRESHOLD /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
+        convert  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg -resize 1280x720\!  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp
+	mv  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg"
                 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$STARTRAILS_DIR" \
@@ -46,7 +49,7 @@ if [[ $STARTRAILS == "true" ]]; then
 fi
 
 # Generate timelapse from collected images
-if [[ $TIMELAPSE == "true" ]]; then
+if [[ $TIMELAPSE == "true" && ! -f /home/pi/allsky/images/$LAST_NIGHT/allsky-$LAST_NIGHT.mp4 ]]; then
 	echo -e "Generating Timelapse\n"
 	./timelapse.sh $LAST_NIGHT
 	echo -e "\n"
