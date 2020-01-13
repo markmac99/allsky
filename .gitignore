@@ -27,3 +27,4 @@ image.jpg*
 test-image.jpg
 wget.log
 logs/
+settings.json.orig

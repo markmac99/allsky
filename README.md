@@ -59,11 +59,6 @@ There is no 1-click update yet so until then, the easiest is to backup your conf
 
 ## Configuration
 
-**non-IP Cameras**
-if you're using an ASI camera, edit **allsky.sh** and remove the parameter -ipcam from the line
-	./capture -ipcam $SETTINGS
-
-**All Cameras**
 Here's a quick overview of the configuration files.
 
 the first one is called **settings.json**. It contains the camera parameters such as exposure, gain but also latitude, longitude, etc.
@@ -109,6 +104,7 @@ nano settings.json
 | time | 1 | Replaces the text overlay |
 | darkframe | 0 | Set to 1 to enable dark frame capture. In this mode, overlays are hidden and the image is saved as dark.png by default |
 | showDetails | 1 | Displays the exposure, gain and temperature in the overlay |
+| ipcam| 1 | Use IPCamera - set to 0 to use ASI | 
 
 The second file called **config.sh** lets you configure the overall behavior of the camera. Options include functionalities such as upload, timelapse, dark frame location, keogram.
 

@@ -29,4 +29,4 @@ ARGUMENTS="$ARGUMENTS -daytime $DAYTIME"
 
 echo "$ARGUMENTS"
 
-./capture -ipcam $ARGUMENTS
+./capture $ARGUMENTS

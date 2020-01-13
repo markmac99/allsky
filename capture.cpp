@@ -454,7 +454,8 @@ int main(int argc, char *argv[])
             }
             else if (strcmp(argv[i], "-ipcam") == 0)
             {
-                isIPCam = true;
+                isIPCam = atoi(argv[i+1])==1?true : false;
+                i++;
             }
         }
     }
@@ -514,7 +515,7 @@ int main(int argc, char *argv[])
                "placement \n");
         printf(" -darkframe                         - Set to 1 to disable time and text overlay \n");
         printf(" -showDetails                       - Set to 1 to display the metadata on the image \n");
-        printf(" -ipcam                             - use ip camera instead of ASI\n");
+        printf(" -ipcam                             - set to 1 to use ip camera instead of ASI\n");
 
         printf("%sUsage:\n", KRED);
         printf(" ./capture -width 640 -height 480 -exposure 5000000 -gamma 50 -type 1 -bin 1 -filename "
