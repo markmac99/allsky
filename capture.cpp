@@ -799,6 +799,13 @@ int main(int argc, char *argv[])
                 ASISetControlValue(CamNum, ASI_EXPOSURE, currentExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
                 ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
             }
+<<<<<<< HEAD
+=======
+            // Set exposure value for night time capture
+            useDelay = delay;
+	    ASISetControlValue(CamNum, ASI_EXPOSURE, currentExposure, asiAutoExposure == 1 ? ASI_TRUE : ASI_FALSE);
+            ASISetControlValue(CamNum, ASI_GAIN, asiGain, asiAutoGain == 1 ? ASI_TRUE : ASI_FALSE);
+>>>>>>> e827fc764dddfdfc53318ba82863f12247d9b4b0
         }
         printf("Press Ctrl+C to stop\n\n");
 
