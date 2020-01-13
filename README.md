@@ -2,7 +2,7 @@
 
 
 
-This is the source code for the Wireless Allsky Camera project described [on Instructables](http://www.instructables.com/id/Wireless-All-Sky-Camera/).
+This is the source code for the Wireless Allsky Camera project described [on Instructables](http://www.instructables.com/id/Wireless-All-Sky-Camera/), but modified to work with an IP Camera.
 
 
 ![](http://www.thomasjacquin.com/allsky-portal/screenshots/camera-header-photo.jpg)
@@ -12,6 +12,7 @@ This is the source code for the Wireless Allsky Camera project described [on Ins
 In order to get the camera working properly you will need the following hardware:
 
  * An ASI camera from ZWO. Tested cameras include ASI120MC*, ASI120MM*, ASI120MC-S, ASI120MM-S, ASI224MC, ASI178MC, ASI185MC, ASI290MC, ASI1600MC
+ * OR an IP Camera capable of producing at least 720x576 resolution images. I used an IMX290 barebones camera bought from AliExpress
  * A Raspberry Pi 2 or 3
  * A USB wireless dongle if using a Pi 2. [This one](https://www.amazon.ca/Edimax-EW-7811Un-150Mbps-Raspberry-Supports/dp/B003MTTJOY) has been tested.
 
@@ -34,7 +35,7 @@ sudo apt-get install git
 Now fetch the code from this GitHub page. Open the terminal and type the following:
 
 ```shell
-git clone --recursive https://github.com/thomasjacquin/allsky.git
+git clone --recursive https://github.com/markmac99/allsky.git
 ```
 
 Then navigate to the allsky directory:
@@ -58,6 +59,11 @@ There is no 1-click update yet so until then, the easiest is to backup your conf
 
 ## Configuration
 
+**non-IP Cameras**
+if you're using an ASI camera, edit **allsky.sh** and remove the parameter -ipcam from the line
+	./capture -ipcam $SETTINGS
+
+**All Cameras**
 Here's a quick overview of the configuration files.
 
 the first one is called **settings.json**. It contains the camera parameters such as exposure, gain but also latitude, longitude, etc.
