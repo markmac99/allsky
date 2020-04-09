@@ -19,7 +19,8 @@ if [ "$UPLOAD_IMG" = true ] ; then
 	# convert "$IMAGE_TO_USE" -resize 962x720 -gravity Center -crop 680x720+40+0 +repage "$FILENAME-resize.$EXTENSION";
 	
 	echo -e "Uploading $FILENAME-resize.$EXTENSION \n" 
-	timeout 5 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20 ; put $FILENAME-resize.$EXTENSION; bye" & 
+	#timeout 5 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20 ; put $FILENAME-resize.$EXTENSION; bye" & 
+	timeout 5 scp -i ~/.ssh/aws.pem $FILENAME-resize.$EXTENSION $USER@$HOST:data/allsky-latest.$EXTENSION
 fi
 
 

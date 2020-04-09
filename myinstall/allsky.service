@@ -1,0 +1,16 @@
+[Unit]
+Description=All Sky Camera
+After=multi-user.target
+
+[Service]
+User=pi
+ExecStart=/home/pi/allsky/allsky.sh
+StandardOutput=/dev/null
+StandardError=syslog
+SyslogIdentifier=allskycamera
+SyslogFacility=local5
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

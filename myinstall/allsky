@@ -1,0 +1,28 @@
+/home/pi/allsky/logs/allsky.log
+{
+	rotate 4
+	weekly
+	missingok
+	notifempty
+	compress
+	delaycompress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate > /dev/null
+	endscript
+}
+/home/pi/allsky/logs/allsky-endnight.log
+{
+	rotate 4
+	weekly
+	missingok
+	notifempty
+	compress
+	delaycompress
+	sharedscripts
+	postrotate
+		invoke-rc.d rsyslog rotate > /dev/null
+	endscript
+}
+
+

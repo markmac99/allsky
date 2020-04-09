@@ -38,10 +38,9 @@ cp $IMAGE_TO_USE "liveview-$FILENAME.$EXTENSION"
 cp $IMAGE_TO_USE "images/$CURRENT/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION"
 
 # Create a thumbnail of the image for faster load in web GUI
-# -- not doing this for my camera
-#if identify $IMAGE_TO_USE >/dev/null 2>&1; then
-#	convert "$IMAGE_TO_USE" -resize 100x75 "images/$CURRENT/thumbnails/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION";
-#fi
+if identify $IMAGE_TO_USE >/dev/null 2>&1; then
+	convert "$IMAGE_TO_USE" -resize 100x75 "images/$CURRENT/thumbnails/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION";
+fi
 
 echo -e "Saving $FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION\n"
 
@@ -58,7 +57,8 @@ if [ "$UPLOAD_IMG" = true ] ; then
 	convert "$IMAGE_TO_USE" -resize 1080x720\! "$FILENAME-resize.$EXTENSION";
 
 	echo -e "Uploading  $FILENAME-resize.$EXTENSION \n"
-	timeout 5 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST" -e "set net:max-retries 1; set net:timeout 20; cd "$IMGDIR"; put $FILENAME-resize.$EXTENSION; bye" &
+	#timeout 5 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST" -e "set net:max-retries 1; set net:timeout 20; cd "$IMGDIR"; put $FILENAME-resize.$EXTENSION; bye" &
+        timeout 5 scp -i ~/.ssh/aws.pem $FILENAME-resize.$EXTENSION $USER@$HOST:data/allsky-latest.$EXTENSION
 fi
 
 
