@@ -17,14 +17,13 @@ scripts/keogram_only.sh
 scripts/startrails_manual.sh
 scripts/startrails_only.sh
 scripts/stretch.sh
-sunwait
 scripts/client_secret.json
 scripts/token.pickle
 scripts/filename.sh
 tmp/*
-sunwait
-image.jpg*
 test-image.jpg
 wget.log
 logs/
 settings.json.orig
+allsky-backup.tgz
+sunwait
