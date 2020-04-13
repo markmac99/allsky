@@ -33,10 +33,10 @@ fi
 
 # Generate startrails from collected images. Treshold set to 0.1 by default in config.sh to avoid stacking over-exposed images
 if [[ $STARTRAILS == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg ]]; then
-        echo -e "Generating Startrails\n"
+    echo -e "Generating Startrails\n"
 	mkdir -p /home/pi/allsky/images/$LAST_NIGHT/startrails/
-        ../startrails /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION $BRIGHTNESS_THRESHOLD /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
-        convert  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg -resize 1280x720\!  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp
+    ../startrails /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION $BRIGHTNESS_THRESHOLD /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
+    convert  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg -resize 1280x720\!  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp
 	mv  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg"
