@@ -31,7 +31,7 @@ if [ -e "$DARK_FRAME" ] ; then
 fi
 
 #Uncomment the following line to enable image stretching
-#convert $IMAGE_TO_USE -sigmoidal-contrast 10,10% $IMAGE_TO_USE
+convert $IMAGE_TO_USE -sigmoidal-contrast 10,50% $IMAGE_TO_USE
 cp $IMAGE_TO_USE "liveview-$FILENAME.$EXTENSION"
 
 # Save image in images/current directory
@@ -54,7 +54,7 @@ if [ "$UPLOAD_IMG" = true ] ; then
 	# Here's what I use with my ASI185MC (larger sensor so I crop the black around the image)
 	#convert "$IMAGE_TO_USE" -resize 962x720 -gravity Center -crop 680x720+40+0 +repage "$FILENAME-resize.$EXTENSION";
 
-	convert "$IMAGE_TO_USE" -resize 1080x720\! "$FILENAME-resize.$EXTENSION";
+	convert "$IMAGE_TO_USE" -resize 1280x720\! "$FILENAME-resize.$EXTENSION";
 
 	echo -e "Uploading  $FILENAME-resize.$EXTENSION \n"
         timeout 5 scp -i $IDFILE $FILENAME-resize.$EXTENSION $USER@$HOST:$IMGDIR/allsky-latest.$EXTENSION
