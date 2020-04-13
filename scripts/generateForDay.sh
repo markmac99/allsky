@@ -25,6 +25,8 @@ echo -e "\n"
 echo -e "Generating Startrails\n"
 mkdir -p /home/pi/allsky/images/$1/startrails/
 ../startrails /home/pi/allsky/images/$1/ $EXTENSION $BRIGHTNESS_THRESHOLD /home/pi/allsky/images/$1/startrails/startrails-$1.jpg
+convert /home/pi/allsky/images/$1/startrails/startrails-$1.jpg -resize 1280x720\! /home/pi/allsky/images/tmp.jpg  
+mv /home/pi/allsky/images/tmp.jpg /home/pi/allsky/images/$1/startrails/startrails-$1.jpg
 echo -e "\n"
 
 # Generate timelapse from collected images
