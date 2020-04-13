@@ -1,6 +1,5 @@
 images/*
 capture
-config.sh
 dark.*
 gibbons*
 liveview*
@@ -11,7 +10,6 @@ log.txt
 settings.json
 startrails
 scripts/data.json
-scripts/ftp-settings.sh
 scripts/keogram_and_startrails.sh
 scripts/keogram_only.sh
 scripts/startrails_manual.sh
