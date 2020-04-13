@@ -41,6 +41,7 @@ if [[ $STARTRAILS == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/startrai
 	if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg"
 		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$STARTRAILS_DIR
+		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$IMGDIR/startrails-latest.jpg
         fi
 
         echo -e "\n"
