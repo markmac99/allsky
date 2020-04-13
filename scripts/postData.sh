@@ -22,4 +22,4 @@ echo \"sunset\": \"$today"T"$timeNoZone":00.000$timezone"\", >> data.json
 echo \"streamDaytime\": \"$streamDaytime\" >> data.json
 echo } >> data.json
 echo "Uploading data.json"
-timeout 10 lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$IMGDIR" -e "set net:max-retries 1; set net:timeout 20; put data.json; bye"
+timeout 5 scp -i $IDFILE data.json $USER@$HOST:$IMGDIR

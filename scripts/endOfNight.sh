@@ -26,8 +26,7 @@ if [[ $KEOGRAM == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/keogram/keo
         ../keogram /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION /home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_KEOGRAM == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg"
-                lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$KEOGRAM_DIR" \
-                        -e "set net:max-retries 1; put $OUTPUT; bye"
+		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$KEOGRAM_DIR
 	fi
         echo -e "\n"
 fi
@@ -41,8 +40,7 @@ if [[ $STARTRAILS == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/startrai
 	mv  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg"
-                lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$STARTRAILS_DIR" \
-			-e "set net:max-retries 1; put $OUTPUT; bye"
+		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$STARTRAILS_DIR
         fi
 
         echo -e "\n"
