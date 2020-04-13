@@ -25,7 +25,7 @@ bash
 ffmpeg -y -f image2 -r 25 -i images/$1/sequence/%04d.$EXTENSION -vcodec libx264 -b:v 2000k -pix_fmt yuv420p images/$1/allsky-$1.mp4
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
-	lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$MP4DIR" -e "set net:max-retries 1; put images/$1/allsky-$1.mp4; bye"
+#	lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$MP4DIR" -e "set net:max-retries 1; put images/$1/allsky-$1.mp4; bye"
   python /home/pi/allsky/scripts/sendToYoutube.py "Timelapse for $1" /home/pi/allsky/images/$1/allsky-$1.mp4
 fi
 

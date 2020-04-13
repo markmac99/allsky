@@ -15,7 +15,7 @@ fi
 
 echo "Posting Next Twilight Time"
 today=`date +%Y-%m-%d`
-time="$(sunwait list set civil $latitude $longitude)"
+time="$(/home/pi/allsky/sunwait list set civil $latitude $longitude)"
 timeNoZone=${time:0:5}
 echo { > data.json
 echo \"sunset\": \"$today"T"$timeNoZone":00.000$timezone"\", >> data.json
