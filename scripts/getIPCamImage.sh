@@ -10,11 +10,11 @@ date > tmp/start.txt
 for i in {1..25}
 do 
     FN=tmp/$i-$FULL_FILENAME
-    wget -t 1 -T 5 -O "$FN" "http://192.168.1.11/webcapture.jpg?command=snap&channel=1&user=admin&password=tlJwpbo6"
+    wget -t 1 -T 5 -O "$FN" "http://192.168.1.11/webcapture.jpg?command=snap&channel=1&user=admin&password=tlJwpbo6" > /dev/null 
 
 done
 date >> tmp/start.txt
-./startrails tmp $EXTENSION $BRIGHTNESS_THRESHOLD $FULL_FILENAME
+./startrails tmp $EXTENSION $BRIGHTNESS_THRESHOLD $FULL_FILENAME > /dev/null 
 
 # my ipcamera generates 1280x720 images but the jpeg is squashed for some reason.
 #convert test-$FULL_FILENAME -resize 1280x720\! test-$FULL_FILENAME.tmp
