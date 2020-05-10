@@ -30,8 +30,10 @@ if [ -e "$DARK_FRAME" ] ; then
 	IMAGE_TO_USE="$FILENAME-processed.$EXTENSION"
 fi
 
-#Uncomment the following line to enable image stretching
-#convert $IMAGE_TO_USE -sigmoidal-contrast 10,50% $IMAGE_TO_USE
+# image stretching
+if [ $STRETCH = "1" ]  ; then
+	convert $IMAGE_TO_USE -sigmoidal-contrast $CONTRAST,$MIDPOINT% $IMAGE_TO_USE
+fi
 cp $IMAGE_TO_USE "liveview-$FILENAME.$EXTENSION"
 
 # Save image in images/current directory
