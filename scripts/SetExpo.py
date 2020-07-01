@@ -11,9 +11,11 @@ daynight=sys.argv[2]
 if daynight == 'DAY':
     expo=30
     gain=30
+    cmode='0x00000001'
 else:
     expo=100
     gain=70
+    cmode='0x00000002'
 
 cam = DVRIPCam(host_ip, "admin", "")
 if cam.login():
@@ -26,6 +28,7 @@ print(params['Param'])
 print(params['Param'][0]['ElecLevel'])
 
 cam.set_info("Camera.Param.[0]",{"ElecLevel":expo})
+cam.set_info("Camera.Param.[0]",{"DayNightColor":cmode})
 cam.set_info("Camera.Param.[0].GainParam",{"Gain":gain})
 params = cam.get_info("Camera")
 print(params['Param'][0]['ElecLevel'])
