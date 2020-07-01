@@ -2,6 +2,6 @@
 source /home/pi/allsky/config.sh
 source /home/pi/allsky/scripts/filename.sh
 
-cd  /home/pi/allsky/scripts
+cd  /home/pi
 
-/usr/bin/python SetExpo.py 192.168.1.11 $1
+/usr/bin/python allsky/scripts/SetExpo.py 192.168.1.11 $1
