@@ -23,7 +23,7 @@ UPLOAD_KEOGRAM=true
 STARTRAILS=true
 
 # Images with a brightness higher than the threshold will be skipped for startrails image generation
-BRIGHTNESS_THRESHOLD=0.20
+BRIGHTNESS_THRESHOLD=0.40
 
 # Set to true to upload the startrails after it has been generated
 UPLOAD_STARTRAILS=true
@@ -41,10 +41,14 @@ DARK_FRAME="dark.png"
 DAYTIME="1"
 
 # set to 0 to disable image stretching
-STRETCH="0"
+STRETCH="1"
+
 # stretch parameters - see documentation for 'convert -sigmoidal-contrast'
 CONTRAST=8
-MIDPOINT=45
+MIDPOINT=25
+
+# IP Camera address, if needed
+IPCAMADDR=192.168.1.11
 
 # Path to the camera settings (exposure, gain, delay, overlay, etc)
 CAMERA_SETTINGS="/etc/raspap/settings.json"
