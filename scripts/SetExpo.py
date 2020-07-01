@@ -1,10 +1,10 @@
 # SetExpo.py
 # sets the exposure on the IPCamera using Python_DVRIP
 #
-
+import os, sys
+sys.path.append('/home/pi/python-dvr')
 from dvrip import DVRIPCam
 from time import sleep
-import os, sys
 
 host_ip = sys.argv[1]
 daynight=sys.argv[2]
