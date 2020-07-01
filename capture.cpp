@@ -221,6 +221,7 @@ int main(int argc, char *argv[])
     int i;
     void *retval;
     bool endOfNight    = false;
+    bool endOfDay      = false;
     pthread_t hthdSave = 0;
     bool isIPCam       = false;
 
@@ -739,6 +740,13 @@ int main(int argc, char *argv[])
     long autoExp        = 0;
     int useDelay        = 0;
 
+    // Find out if it is currently DAY or NIGHT and set camera accordingly
+    calculateDayOrNight(latitude, longitude, angle);
+    if (dayOrNight == "DAY")
+        system("scripts/setIPCamExpo.sh DAY")
+    else
+        system("scripts/setIPCamExpo.sh NIGHT")
+
     while (bMain)
     {
         bool needCapture = true;
@@ -756,6 +764,7 @@ int main(int argc, char *argv[])
             if (endOfNight == true)
             {
                 system("scripts/endOfNight.sh &");
+                system("scripts/setIPCamExpo.sh DAY")
                 endOfNight = false;
             }
             if (daytimeCapture != 1)
@@ -780,10 +789,17 @@ int main(int argc, char *argv[])
         }
         else //if (dayOrNight == "NIGHT")
         {
+            if(endOfDay == true)
+            {
+                system("scripts/setIPCamExpo.sh NIGHT")
+                endOfDay = false;
+            }
             if(isIPCam)
             {
                 useDelay = asiExposure/1000;
                 printf("Saving auto exposed images every %d s\n\n", useDelay/1000);
+                // set the IP Camera to daylight mode
+                system("scripts/setIPCamExpo.sh NIGHT")
             }
             else
             {
@@ -923,6 +939,10 @@ int main(int argc, char *argv[])
             if (lastDayOrNight == "NIGHT")
             {
                 endOfNight = true;
+            }
+            if (lastDayOrNight == "DAY")
+            {
+                endOfDay = true;
             }
             if(!isIPCam)
                 ASIStopVideoCapture(CamNum);
