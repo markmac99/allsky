@@ -25,8 +25,9 @@ bash
 ffmpeg -y -f image2 -r 25 -i images/$1/sequence/%04d.$EXTENSION -vcodec libx264 -b:v 2000k -pix_fmt yuv420p images/$1/allsky-$1.mp4
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
+  echo -en "Sending timelapse to youtube\n"
   scp -i $IDFILE images/$1/allsky-$1.mp4 $USER@$HOST:$MP4DIR
-  python /home/pi/allsky/scripts/sendToYoutube.py "Timelapse for $1" /home/pi/allsky/images/$1/allsky-$1.mp4
+  python /home/pi/allsky/scripts/sendToYoutube.py "Allsky Timelapse for $1" /home/pi/allsky/images/$1/allsky-$1.mp4
 fi
 
 echo -en "* ${GREEN}Deleting sequence${NC}\n"
