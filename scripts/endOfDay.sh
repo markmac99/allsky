@@ -11,6 +11,8 @@ LAST_NIGHT=$(date +'%Y%m%d')
 # generate funny colors in the summary images...
 # ./removeBadImages.sh /home/pi/allsky/images/$LAST_NIGHT/  
 
+python3 SetExpo.py $IPCAMADDR NIGHT
+
 # Generate timelapse from collected images
 if [[ $TIMELAPSE == "true" && ! -f /home/pi/allsky/images/$LAST_NIGHT/daytime/allsky-$LAST_NIGHT.mp4 ]]; then
 	echo -e "Generating Timelapse\n"

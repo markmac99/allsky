@@ -22,7 +22,7 @@ find "/home/pi/allsky/images/$1/daytime" -name "*.$EXTENSION" -size 0 -delete
 ls -rt /home/pi/allsky/images/$1/daytime/*.$EXTENSION |
 gawk 'BEGIN{ a=1 }{ printf "ln -sv %s /home/pi/allsky/images/'$1'/daytime/sequence/%04d.'$EXTENSION'\n", $0, a++ }' |
 bash
-ffmpeg -y -f image2 -r 25 -i images/$1/daytime/sequence/%04d.$EXTENSION -vcodec libx264 -b:v 2000k -pix_fmt yuv420p images/$1/allsky-$1-day.mp4
+ffmpeg -y -f image2 -r 10 -i images/$1/daytime/sequence/%04d.$EXTENSION -vcodec libx264 -b:v 2000k -pix_fmt yuv420p images/$1/allsky-$1-day.mp4
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
   echo -en "Sending timelapse to youtube\n"
@@ -31,6 +31,6 @@ if [ "$UPLOAD_VIDEO" = true ] ; then
 fi
 
 echo -en "* ${GREEN}Deleting sequence${NC}\n"
-rm -rf /home/pi/allsky/images/$1/sequence
+rm -rf /home/pi/allsky/images/$1/daytime/sequence
 
 echo -en "* ${GREEN}Timelapse was created${NC}\n"
