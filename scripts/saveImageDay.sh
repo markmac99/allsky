@@ -4,6 +4,10 @@ source /home/pi/allsky/scripts/filename.sh
 
 cd /home/pi/allsky
 
+# Make a directory to store current images
+CURRENT=$(date +'%Y%m%d')
+mkdir -p images/$CURRENT/daytime/thumbnails
+
 IMAGE_TO_USE="$FULL_FILENAME"
 cp $IMAGE_TO_USE "liveview-$FILENAME.$EXTENSION"
 
@@ -22,4 +26,11 @@ if [ "$UPLOAD_IMG" = true ] ; then
 	timeout 5 scp -i $IDFILE $FILENAME-resize.$EXTENSION $USER@$HOST:$IMGDIR/allsky-latest.$EXTENSION
 fi
 
+# Create a thumbnail of the image for faster load in web GUI
+if identify $IMAGE_TO_USE >/dev/null 2>&1; then
+        convert "$IMAGE_TO_USE" -resize 100x75 "images/$CURRENT/daytime/thumbnails/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION";
+fi
+
+echo -e "Saving $FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION\n"
+cp $FULL_FILENAME images/$CURRENT/daytime/$FILENAME-$(date +'%Y%m%d%H%M%S').$EXTENSION
 

@@ -12,6 +12,7 @@ if [[ $POST_END_OF_NIGHT_DATA == "true" ]]; then
         ./postData.sh
 	echo -e "\n"
 fi
+python 3 SetExpo.py $IPCAMADDR DAY
 
 # Uncomment this to scan for, and remove corrupt images before generating
 # keograms and startrails. This can take several (tens of) minutes to run

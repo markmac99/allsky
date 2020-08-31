@@ -1,14 +1,21 @@
 #!/bin/bash
 
-echo  `date +%Y%m%d-%H%M%S` checking network | tee -a /home/pi/allsky/logs/reboot-`date +%Y%m%d`.log
+export PATH=$PATH:/usr/bin:/usr/sbin:/sbin
+/usr/bin/logger `date +%Y%m%d-%H%M%S` checking network 
 
-ping -c 1 -w 5 192.168.1.11
-sleep 10
-if [ $? -ne 0 ] ; then 
-  ping -c 1 -w 5 192.168.1.11
-  if [ $? -ne 0 ] ; then 
-    echo `date +%Y%m%d-%H%M%S` rebooting | tee -a /home/pi/allsky/logs/reboot-`date +%Y%m%d`.log
-    /sbin/shutdown -r now | tee -a /home/pi/allsky/logs/reboot-`date +%Y%m%d`.log
+ping -c 1 -w 5 192.168.1.254  >/dev/null 2>1
+ret=$?
+if [ $ret -ne 0 ] ; then 
+  sleep 10
+  ping -c 1 -w 5 192.168.1.254 > /dev/null 2>&1
+  ret=$?
+  if [ $ret -ne 0 ] ; then 
+    /usr/bin/logger `date +%Y%m%d-%H%M%S` rebooting 
+    /sbin/shutdown -r now 
+  else
+    /usr/bin/logger check 2 network up - retcode was $ret
   fi
+else 
+  /usr/bin/logger network up - retcode was $ret
 fi
 

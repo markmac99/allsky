@@ -791,6 +791,7 @@ int main(int argc, char *argv[])
         {
             if(endOfDay == true)
             {
+                system("scripts/endOfDay.sh &");
                 system("scripts/setIPCamExpo.sh NIGHT");
                 endOfDay = false;
             }
