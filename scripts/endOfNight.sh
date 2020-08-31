@@ -19,6 +19,11 @@ fi
 # generate funny colors in the summary images...
 # ./removeBadImages.sh /home/pi/allsky/images/$LAST_NIGHT/  
 
+yymm=${LAST_NIGHT:0:6}
+ssh -i $IDFILE $USER@$HOST mkdir $KEOGRAM_DIR/$yymm >/dev/null 2>&1
+ssh -i $IDFILE $USER@$HOST mkdir $STARTRAILS_DIR/$yymm >/dev/null 2>&1
+ssh -i $IDFILE $USER@$HOST mkdir $MP4DIR/$yymm >/dev/null 2>&1
+
 # Generate keogram from collected images
 if [[ $KEOGRAM == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg ]]; then
         echo -e "Generating Keogram\n"
@@ -26,7 +31,7 @@ if [[ $KEOGRAM == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/keogram/keo
         ../keogram /home/pi/allsky/images/$LAST_NIGHT/ $EXTENSION /home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_KEOGRAM == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.jpg"
-		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$KEOGRAM_DIR
+		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:${KEOGRAM_DIR}${yymm}
 	fi
         echo -e "\n"
 fi
@@ -40,7 +45,7 @@ if [[ $STARTRAILS == "true"  && ! -f /home/pi/allsky/images/$LAST_NIGHT/startrai
 	mv  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg.tmp  /home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg
 	if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
 		OUTPUT="/home/pi/allsky/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.jpg"
-		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$STARTRAILS_DIR
+		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:${STARTRAILS_DIR}${yymm}
 		timeout 5 scp -i $IDFILE $OUTPUT $USER@$HOST:$IMGDIR/startrails-latest.jpg
         fi
 
