@@ -26,9 +26,13 @@ ffmpeg -y -f image2 -r 10 -i images/$1/daytime/sequence/%04d.$EXTENSION -vcodec 
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
   echo -en "Sending timelapse to youtube\n"
-  scp -i $IDFILE images/$1/allsky-$1-day.mp4 $USER@$HOST:$MP4DIR
   python /home/pi/allsky/scripts/sendToYoutube.py "Allsky Day Timelapse for $1" /home/pi/allsky/images/$1/allsky-$1-day.mp4
 fi
+dt=$1
+yymm=${dt:0:6}
+ssh -i $IDFILE $USER@$HOST mkdir $MP4DIR/$yymm >/dev/null 2>&1
+scp -i $IDFILE images/$1/allsky-$1-day.mp4 $USER@$HOST:$MP4DIR/$yymm
+
 
 echo -en "* ${GREEN}Deleting sequence${NC}\n"
 rm -rf /home/pi/allsky/images/$1/daytime/sequence
