@@ -49,6 +49,7 @@ MIDPOINT=25
 
 # IP Camera address, if needed
 IPCAMADDR=192.168.1.11
+DEVICESTRING="rtsp://192.168.1.11:554/user=admin&password=&channel=1&stream=0.sdp"
 
 # Path to the camera settings (exposure, gain, delay, overlay, etc)
 CAMERA_SETTINGS="/etc/raspap/settings.json"
