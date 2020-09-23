@@ -35,6 +35,7 @@ char const *fileName = "image.jpg";
 std::vector<int> compression_parameters;
 bool bMain = true, bDisplay = false;
 std::string dayOrNight="DAY";
+char* ipDevice={0};
 
 bool bSaveRun = false, bSavingImg = false;
 pthread_mutex_t mtx_SaveImg;
@@ -649,8 +650,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("Using IP Camera");
         sType = "IP Camera";
+        ipDevice=getenv("DEVICESTRING")
     }
 
     //-------------------------------------------------------------------------------------------------------
@@ -658,6 +659,8 @@ int main(int argc, char *argv[])
 
     printf("%s", KGRN);
     printf("\nCapture Settings: \n");
+    if(isIPCam)
+        printf('IP Device is %s\n', ipDevice)
     printf(" Image Type: %s\n", sType);
     printf(" Resolution: %dx%d \n", width, height);
     printf(" Quality: %d \n", quality);
@@ -764,7 +767,6 @@ int main(int argc, char *argv[])
             if (endOfNight == true)
             {
                 system("scripts/endOfNight.sh &");
-                system("scripts/setIPCamExpo.sh DAY");
                 endOfNight = false;
             }
             if (daytimeCapture != 1)
@@ -792,7 +794,6 @@ int main(int argc, char *argv[])
             if(endOfDay == true)
             {
                 system("scripts/endOfDay.sh &");
-                system("scripts/setIPCamExpo.sh NIGHT");
                 endOfDay = false;
             }
             if(isIPCam)
@@ -928,8 +929,49 @@ int main(int argc, char *argv[])
                 }
                 else // its an IP Camera
                 {
-                    std::string cmd = "scripts/getIPCamImage.sh " + dayOrNight;
-                    system(cmd.c_str());
+                    cv::VideoCapture cap;
+                    int nFrames=256;
+                    cv::Mat frame;
+                    cap.open(ipDevice);
+                    if (!cap.isOpened()) 
+                    {
+                        std::cerr << "ERROR! Unable to open camera" << std::endl;
+                    }
+                    else
+                    {
+                        cap.read(frame);
+                        cv::Mat cumul = cv::Mat::zeros(frame.size(), CV_64FC3); //larger depth to avoid saturation
+                        cumul = frame;
+                        //cv::accumulate(frame, cumul);
+                        for(int i=1;i<nFrames;i++)
+                        {        
+                            cap.read(frame);
+                            if (frame.empty()) 
+                            {
+                                std::cerr << "ERROR! blank frame grabbed" <<std::endl;
+                                nFrames--;
+                            }
+                            cv::Mat tmp=cumul;
+                            cv::add(tmp, frame, cumul, cv::noArray(), CV_32FC3);
+                        }
+                        if(nFrames >1) 
+                            cumul /= nFrames;
+                        cv::Mat avg = cv::Mat::zeros(frame.size(), CV_8UC3);
+                        cumul.convertTo(avg, CV_8UC3);
+                        cv::imwrite(filename, avg);
+                        cap.release();
+                        if (dayOrNight == "NIGHT")
+                        {
+                            system("scripts/saveImageNight.sh &");
+                        }
+                        else
+                        {
+                            system("scripts/saveImageDay.sh &");
+                        }
+                    }
+
+                    //std::string cmd = "scripts/getIPCamImage.sh " + dayOrNight;
+                    //system(cmd.c_str());
                     usleep(useDelay*1000);
                     calculateDayOrNight(latitude, longitude, angle);
                     //std::cout << dayOrNight << std::endl;

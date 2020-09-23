@@ -29,3 +29,4 @@ image.jpg
 *.obj
 *.pdb
 test/*
+*.mp4
