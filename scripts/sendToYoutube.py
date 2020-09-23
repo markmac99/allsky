@@ -19,6 +19,7 @@ import googleapiclient.errors
 
 from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
+from googleapiclient.errors import HttpError
 
 scopes = ["https://www.googleapis.com/auth/youtube.upload"]
 
@@ -69,11 +70,19 @@ def main():
           }
         },
         
-        media_body=MediaFileUpload(fname)
+        media_body=MediaFileUpload(fname,  chunksize=-1, resumable=True)
     )
-    response = request.execute()
-
-    print(response)
+    try: 
+      status, response = request.next_chunk() # request.execute()
+      print(status, response)
+      if response is not None:
+        if 'id' in response:
+          print "Video id '%s' was successfully uploaded." % response['id']
+        else:
+          exit("The upload failed with an unexpected response: %s" % response)
+    except HttpError as e:
+       error='HTTP error %d arose with status: \'%s\' ' % (e.resp.status, e.content)
+       print(error)
 
 if __name__ == "__main__":
     main()
