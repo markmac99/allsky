@@ -935,7 +935,7 @@ int main(int argc, char *argv[])
                     cap.open(ipDevice);
                     if (!cap.isOpened()) 
                     {
-                        std::cerr << "ERROR! Unable to open camera %s" << ipDevice << std::endl;
+                        std::cerr << "ERROR! Unable to open camera " << ipDevice << std::endl;
                     }
                     else
                     {
@@ -957,7 +957,7 @@ int main(int argc, char *argv[])
                         if(nFrames >1) 
                         {
                             if(dayOrNight == "NIGHT")
-                                cumul /= (nFrames/2); // brighten the image a bit
+                                cumul /= (nFrames); // brighten the image a bit
                             else 
                                 cumul /= nFrames;
                         }
