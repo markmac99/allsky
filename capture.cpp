@@ -963,7 +963,7 @@ int main(int argc, char *argv[])
                         }
                         cv::Mat avg = cv::Mat::zeros(frame.size(), CV_8UC3);
                         cumul.convertTo(avg, CV_8UC3);
-                        cv::imwrite(filename, avg);
+                        cv::imwrite(fileName, avg);
                         cap.release();
                         if (dayOrNight == "NIGHT")
                         {
