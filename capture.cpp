@@ -651,7 +651,7 @@ int main(int argc, char *argv[])
     else
     {
         sType = "IP Camera";
-        ipDevice=getenv("DEVICESTRING")
+        ipDevice=getenv("DEVICESTRING");
     }
 
     //-------------------------------------------------------------------------------------------------------
