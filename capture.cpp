@@ -660,7 +660,7 @@ int main(int argc, char *argv[])
     printf("%s", KGRN);
     printf("\nCapture Settings: \n");
     if(isIPCam)
-        printf('IP Device is %s\n', ipDevice)
+        printf("IP Device is %s\n", ipDevice)
     printf(" Image Type: %s\n", sType);
     printf(" Resolution: %dx%d \n", width, height);
     printf(" Quality: %d \n", quality);
@@ -955,7 +955,12 @@ int main(int argc, char *argv[])
                             cv::add(tmp, frame, cumul, cv::noArray(), CV_32FC3);
                         }
                         if(nFrames >1) 
-                            cumul /= nFrames;
+                        {
+                            if(dayOrNight == "NIGHT")
+                                cumul /= (nFrames/2); // brighten the image a bit
+                            else 
+                                cumul /= nFrames;
+                        }
                         cv::Mat avg = cv::Mat::zeros(frame.size(), CV_8UC3);
                         cumul.convertTo(avg, CV_8UC3);
                         cv::imwrite(filename, avg);
