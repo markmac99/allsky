@@ -935,7 +935,7 @@ int main(int argc, char *argv[])
                     cap.open(ipDevice);
                     if (!cap.isOpened()) 
                     {
-                        std::cerr << "ERROR! Unable to open camera" << std::endl;
+                        std::cerr << "ERROR! Unable to open camera %s" << ipDevice << std::endl;
                     }
                     else
                     {
