@@ -660,7 +660,7 @@ int main(int argc, char *argv[])
     printf("%s", KGRN);
     printf("\nCapture Settings: \n");
     if(isIPCam)
-        printf("IP Device is %s\n", ipDevice)
+        printf("IP Device is %s\n", ipDevice);
     printf(" Image Type: %s\n", sType);
     printf(" Resolution: %dx%d \n", width, height);
     printf(" Quality: %d \n", quality);
