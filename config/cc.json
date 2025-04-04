@@ -1,0 +1,293 @@
+{
+	"cameraType" : "RPi",
+	"cameraTypes" : [
+		{ "value" : "RPi", "label" : "RPi" },
+		{ "value" : "Refresh", "label" : "Refresh" }
+	],
+	"cameraName" : "HQ",
+	"cameraModel" : "HQ",
+	"cameraModels" : [
+		{ "value" : "HQ", "label" : "HQ [imx477]" }
+	],
+	"sensor" : "imx477",
+	"cameraNumber" : 0,
+	"serialNumber" : "",
+	"sensorWidth" : 4056,
+	"sensorHeight" : 3040,
+	"pixelSize" : 1.55,
+	"supportedBins" : [
+		{ "value" : 1, "label" : "1x1" },
+		{ "value" : 2, "label" : "2x2" }
+	],
+	"hasSensorTemperature" : true,
+	"colorCamera" : true,
+	"bayerPattern" : "RG",
+	"bitDepth" : 12,
+	"acquisitionCommand" : "libcamera-still",
+	"autoFocus" : false,
+	"supportedRotations": [
+		{ "value" : 0, "label" : "None" },
+		{ "value" : 180, "label" : "180 degrees" }
+	],
+	"supportedImageFormats": [
+		{ "value" : 99, "label" : "auto" },
+		{ "value" : 1, "label" : "RGB24" }
+	],
+	"controls": [
+		{
+			"Name" : "imageCropTop",
+			"argumentName" : "imagecroptop",
+			"MinValue" : 0,
+			"MaxValue" : 2736,
+			"DefaultValue" : 0
+		},
+		{
+			"Name" : "imageCropRight",
+			"argumentName" : "imagecropright",
+			"MinValue" : 0,
+			"MaxValue" : 3650,
+			"DefaultValue" : 0
+		},
+		{
+			"Name" : "imageCropBottom",
+			"argumentName" : "imagecropbottom",
+			"MinValue" : 0,
+			"MaxValue" : 2736,
+			"DefaultValue" : 0
+		},
+		{
+			"Name" : "imageCropLeft",
+			"argumentName" : "imagecropleft",
+			"MinValue" : 0,
+			"MaxValue" : 3650,
+			"DefaultValue" : 0
+		},
+		{
+			"Name" : "timelapseWidth",
+			"argumentName" : "timelapsewidth",
+			"MaxValue" : 4056
+		},
+		{
+			"Name" : "timelapseHeight",
+			"argumentName" : "timelapseheight",
+			"MaxValue" : 3040
+		},
+		{
+			"Name" : "minitimelapseWidth",
+			"argumentName" : "minitimelapsewidth",
+			"MaxValue" : 4056
+		},
+		{
+			"Name" : "minitimelapseHeight",
+			"argumentName" : "minitimelapseheight",
+			"MaxValue" : 3040
+		},
+		{
+			"Name" : "imageresizeuploadsWidth",
+			"argumentName" : "imageresizeuploadswidth",
+			"MaxValue" : 4056
+		},
+		{
+			"Name" : "imageresizeuploadsHeight",
+			"argumentName" : "imageresizeuploadsheight",
+			"MaxValue" : 3040
+		},
+		{
+			"Name" : "dayautogain",
+			"argumentName" : "dayautogain",
+			"DefaultValue" : true
+		},
+		{
+			"Name" : "nightautogain",
+			"argumentName" : "nightautogain",
+			"DefaultValue" : true
+		},
+		{
+			"Name" : "delayBetweenImages_ms",
+			"argumentName" : "delay",
+			"MinValue" : 0,
+			"MaxValue" : "none"
+		},
+		{
+			"Name" : "daymean",
+			"argumentName" : "daymean",
+			"MinValue" : 0.0,
+			"MaxValue" : 1.0,
+			"DefaultValue" : 0.5
+		},
+		{
+			"Name" : "DayMeanThreshold",
+			"argumentName" : "daymeanthreshold",
+			"MinValue" : 0.01,
+			"MaxValue" : 1.0,
+			"DefaultValue" : 0.10
+		},
+		{
+			"Name" : "nightmean",
+			"argumentName" : "nightmean",
+			"MinValue" : 0.0,
+			"MaxValue" : 1.0,
+			"DefaultValue" : 0.2
+		},
+		{
+			"Name" : "NightMeanThreshold",
+			"argumentName" : "nightmeanthreshold",
+			"MinValue" : 0.01,
+			"MaxValue" : 1.0,
+			"DefaultValue" : 0.10
+		},
+		{
+			"Name" : "AutoWhiteBalance",
+			"argumentName" : "awb",
+			"DefaultValue" : false
+		},
+		{
+			"Name" : "showTemp",
+			"argumentName" : "showtemp",
+			"DefaultValue" : false
+		},
+		{
+			"Name" : "ExtraArguments",
+			"argumentName" : "extraargs"
+		},
+		{
+			"Name" : "TuningFile",
+			"argumentName" : "tuningfile",
+			"DefaultValue" : ""
+		},
+		{
+			"Name" : "Rotation",
+			"argumentName" : "rotation"
+		},
+		{
+			"Name" : "Gain",
+			"argumentName" : "gain",
+			"MinValue" : 1,
+			"MaxValue" : 16,
+			"DefaultValue" : 1,
+			"IsAutoSupported" : true,
+			"IsWritable" : true,
+			"ControlType" : 0
+		},
+		{
+			"Name" : "Exposure",
+			"argumentName" : "exposure",
+			"MinValue" : 0.114,
+			"MaxValue" : 230000,
+			"DefaultValue" : 10,
+			"IsAutoSupported" : true,
+			"IsWritable" : true,
+			"ControlType" : 1
+		},
+		{
+			"Name" : "WB_R",
+			"argumentName" : "wbr",
+			"MinValue" : 0.100,
+			"MaxValue" : 10,
+			"DefaultValue" : 2.500,
+			"IsAutoSupported" : true,
+			"IsWritable" : true,
+			"ControlType" : 2
+		},
+		{
+			"Name" : "WB_B",
+			"argumentName" : "wbb",
+			"MinValue" : 0.100,
+			"MaxValue" : 10,
+			"DefaultValue" : 2,
+			"IsAutoSupported" : true,
+			"IsWritable" : true,
+			"ControlType" : 3
+		},
+		{
+			"Name" : "Flip",
+			"argumentName" : "flip",
+			"MinValue" : 0,
+			"MaxValue" : 3,
+			"DefaultValue" : 0,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 5
+		},
+		{
+			"Name" : "AutoExpMaxGain",
+			"argumentName" : "maxautogain",
+			"MinValue" : 1,
+			"MaxValue" : 16,
+			"DefaultValue" : 16,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 6
+		},
+		{
+			"Name" : "AutoExpMaxExpMS",
+			"argumentName" : "maxautoexposure",
+			"MinValue" : 1,
+			"MaxValue" : 230000,
+			"DefaultValue" : 60000,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 7
+		},
+		{
+			"Name" : "ExposureCompensation",
+			"argumentName" : "ev",
+			"MinValue" : -10,
+			"MaxValue" : 10,
+			"DefaultValue" : 0,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 9
+		},
+		{
+			"Name" : "Saturation",
+			"argumentName" : "saturation",
+			"MinValue" : 0,
+			"MaxValue" : 15.990,
+			"DefaultValue" : 1,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 10
+		},
+		{
+			"Name" : "Contrast",
+			"argumentName" : "contrast",
+			"MinValue" : 0,
+			"MaxValue" : 15.990,
+			"DefaultValue" : 1,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 11
+		},
+		{
+			"Name" : "Sharpness",
+			"argumentName" : "sharpness",
+			"MinValue" : 0,
+			"MaxValue" : 15.990,
+			"DefaultValue" : 1,
+			"IsAutoSupported" : false,
+			"IsWritable" : true,
+			"ControlType" : 12
+		},
+		{
+			"Name" : "dayexposure",
+			"argumentName" : "dayexposure",
+			"DefaultValue" : 500
+		},
+		{
+			"Name" : "nightexposure",
+			"argumentName" : "nightexposure",
+			"DefaultValue" : 10000
+		},
+		{
+			"Name" : "daygain",
+			"argumentName" : "daygain",
+			"DefaultValue" : 1
+		},
+		{
+			"Name" : "nightgain",
+			"argumentName" : "nightgain",
+			"DefaultValue" : 8
+		}
+	]
+}
