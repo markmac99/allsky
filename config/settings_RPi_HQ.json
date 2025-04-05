@@ -133,15 +133,15 @@
     "remotewebsiteurl": "",
     "remotewebsiteimageurl": "",
     "remotewebsiteimagedir": "allsky",
-    "remotewebsiteprotocol": "s3",
+    "remotewebsiteprotocol": "sftp",
     "remotewebsiteimageuploadoriginalname": false,
     "useremoteserver": true,
     "remoteserverimagedir": "",
     "remoteserverprotocol": "s3",
-    "remoteserverimageuploadoriginalname": false,
-    "remoteservervideodestinationname": "allsky.mp4",
-    "remoteserverkeogramdestinationname": "keogram.jpg",
-    "remoteserverstartrailsdestinationname": "startrails.jpg",
+    "remoteserverimageuploadoriginalname": true,
+    "remoteservervideodestinationname": "",
+    "remoteserverkeogramdestinationname": "",
+    "remoteserverstartrailsdestinationname": "",
     "showonmap": false,
     "location": "Oxfordshire, UK",
     "owner": "Tackley Observatory",
@@ -158,5 +158,5 @@
     "cameratype": "RPi",
     "cameramodel": "HQ",
     "cameranumber": 0,
-    "lastchanged": "2025-04-04 20:51:38"
+    "lastchanged": "2025-04-05 10:04:01"
 }

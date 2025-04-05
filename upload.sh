@@ -223,24 +223,25 @@ function get_REMOTE_USER_HOST_PORT()
 trap "" SIGTERM
 trap "" SIGHUP
 
+# echo "Filetype is $FILE_TYPE protocol is $PROTOCOL directory is $DIRECTORY" 
 if [[ ${PROTOCOL} == "s3" ]] ; then
 	AWS_CLI_DIR="$( settings ".${PREFIX}_AWS_CLI_DIR" "${ALLSKY_ENV}" )"
 	S3_BUCKET="$( settings ".${PREFIX}_S3_BUCKET" "${ALLSKY_ENV}" )"
 	S3_ACL="$( settings ".${PREFIX}_S3_ACL" "${ALLSKY_ENV}" )"
 
+	# echo "S3 bucket is $S3_BUCKET"
+
 	if [ "$FILE_TYPE" == "Keogram" ] ; then
-		YYMM=${DESTINATION_NAME:8:6}
-		DIRECTORY1=$(dirname $(dirname $DIRECTORY))/keograms/$YYMM/
-		DIRECTORY=${DIRECTORY1}
+		DIRECTORY=${DESTINATION_NAME:8:6}/
+		S3_BUCKET=${S3_BUCKET/images/keograms}
 	elif [ "$FILE_TYPE" == "Startrails" ] ; then 
-		YYMM=${DESTINATION_NAME:11:6}
-		DIRECTORY1=$(dirname $(dirname $DIRECTORY))/startrails/$YYMM/
-		DIRECTORY=${DIRECTORY1}
-		DIRECTORY=${DIRECTORY1}
+		DIRECTORY=${DESTINATION_NAME:11:6}/
+		S3_BUCKET=${S3_BUCKET/images/startrails}
 	elif [ "$FILE_TYPE" == "Timelapse" ] ; then 
-		YYMM=${DESTINATION_NAME:7:6}
-		DIRECTORY1=$(dirname $(dirname $DIRECTORY))/videos/$YYMM/
-		DIRECTORY=${DIRECTORY1}
+		DIRECTORY=${DESTINATION_NAME:7:6}/
+		S3_BUCKET=${S3_BUCKET/images/videos}
+	elif [ "$FILE_TYPE" == "SaveImage-server" ] ; then 
+		DESTINATION_NAME="image.jpg"
 	elif [ "$FILE_TYPE" == "TimelapseThumbnail" ] ; then 
 		exit 0
 	fi 
@@ -249,8 +250,13 @@ if [[ ${PROTOCOL} == "s3" ]] ; then
 	if [[ ${SILENT} == "false" && ${ALLSKY_DEBUG_LEVEL} -ge 3 ]]; then
 		echo "${ME}: Uploading ${FILE_TO_UPLOAD} to ${DEST}"
 	fi
-	OUTPUT="$( "${AWS_CLI_DIR}/aws" s3 cp "${FILE_TO_UPLOAD}" "${DEST}" --acl "${S3_ACL}" 2>&1 )"
+	OUTPUT="$( "${AWS_CLI_DIR}/aws" s3 cp "${FILE_TO_UPLOAD}" "${DEST}" --acl "${S3_ACL}" --quiet 2>&1 )"
 	RET=$?
+	if [ $RET -ne 0 ] ; then
+		OUTPUT="$DEST failed"
+	else
+		OUTPUT="$DEST success"
+	fi
 
 
 elif [[ "${PROTOCOL}" == "scp" || "${PROTOCOL}" == "rsync" ]] ; then
