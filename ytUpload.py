@@ -108,7 +108,7 @@ def updateCrontab(here, offset=30, lati=51.88, longi=-1.31, elev=80):
 def scanLogFile(logname, toddt):
     lis = open(logname,'r').readlines()
     tllines = [x for x in lis if 'Timelapse complete' in x]
-    tllines = [x for x in tllines if toddt.strftime('%Y-%m-%d') in x]
+    tllines = [x for x in tllines if toddt.strftime('%c')[4:10] in x]
     if len(tllines) > 0:
         return True
     return False
