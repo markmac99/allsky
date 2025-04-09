@@ -3,7 +3,7 @@
   vars_files: 
     - /mnt/e/dev/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/meteorhunting/pi-meteortools/allsky
+    srcdir: /mnt/e/dev/astronomy/allsky
     destdir: "{{ ansible_env.HOME }}/src/tackley-tools"
     allskydir: "{{ ansible_env.HOME }}/allsky"
     logdir: "{{ ansible_env.HOME }}/logs"

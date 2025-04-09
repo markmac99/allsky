@@ -7,6 +7,7 @@ ExecStart=SRCDIR/checkStatus.sh
 ExecStop=/usr/bin/touch LOGDIR/stopcheckallsky
 Restart=always
 RestartSec=5
+User=mark
 
 [Install]
 WantedBy=multi-user.target

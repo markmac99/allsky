@@ -7,22 +7,12 @@ import time
 import logging
 from logging.handlers import RotatingFileHandler
 
+from sendToMQTT import sendStatusUpdate
+
 log = logging.getLogger('checkAllsky')
 
 MAXDELAY = 120      # time to wait to rebood
 SUPERMAXDELAY=1800  # wait 30 mins to create timelapse in case its still working
-
-
-def hasStalled(dt, logfile):
-    loglines = open(logfile, 'r').readlines()
-    lastline = loglines[-1][:19]
-    lastdt = datetime.datetime.strptime(lastline, '%Y-%m-%dT%H:%M:%S')
-    dtstr = datetime.datetime.strftime(dt, '%Y-%m-%d')
-    tllines = [li for li in loglines if 'Timelapse' in li]
-    dtdlines = [li for li in tllines if dtstr in li]
-    if len(dtdlines) == 1:
-        return (datetime.datetime.now()-lastdt).seconds > SUPERMAXDELAY
-    return (datetime.datetime.now()-lastdt).seconds > MAXDELAY
 
 
 if __name__ == '__main__':
@@ -39,11 +29,19 @@ if __name__ == '__main__':
         os.remove(stopfile)
     runme = True
     log.info('starting')
+    logfile = '/var/log/allsky.log'
     while runme is True:
         log.info('checking')
-        if hasStalled(datetime.datetime.now(), '/var/log/allsky.log'):
-            log.info('stuck, rebooting')
-            os.system('sudo reboot now')
+        status = 1
+        loglines = open(logfile, 'r').readlines()
+        lastline = loglines[-1][:15]
+        lastdt = datetime.datetime.strptime(lastline, '%b %d %H:%M:%S')
+        stalled = (datetime.datetime.now()-lastdt).seconds > MAXDELAY
+        if stalled:
+            log.info('stuck, alerting operator')
+            if stalled:
+                status = 0
+        sendStatusUpdate(status, datetime.datetime.now())
             
         if os.path.isfile(stopfile):
             os.remove(stopfile)

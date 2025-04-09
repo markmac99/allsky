@@ -69,6 +69,26 @@ def sendOtherData(cputemp, diskspace, localcfg=None):
     return ret
 
 
+def sendStatusUpdate(status, stsdate, localcfg=None):
+    if localcfg is None:
+        srcdir = os.path.split(os.path.abspath(__file__))[0]
+        localcfg = configparser.ConfigParser()
+        localcfg.read(os.path.join(srcdir, 'config.ini'))
+    broker = localcfg['mqtt']['broker']
+    hname = platform.uname().node
+    client = mqtt.Client(hname)
+    client.on_connect = on_connect
+    client.on_publish = on_publish
+    if localcfg['mqtt']['username'] != '':
+        client.username_pw_set(localcfg['mqtt']['username'], localcfg['mqtt']['password'])
+    client.connect(broker, 1883, 60)
+    topic = f'meteorcams/{hname}/last_update'
+    ret = client.publish(topic, payload=stsdate.strftime('%Y-%m-%dT%H:%M:%SZ'), qos=0, retain=False)
+    topic = f'meteorcams/{hname}/status'
+    ret = client.publish(topic, payload=status, qos=0, retain=False)
+    return ret
+
+
 def test_mqtt(localcfg=None):
     if localcfg is None:
         srcdir = os.path.split(os.path.abspath(__file__))[0]
