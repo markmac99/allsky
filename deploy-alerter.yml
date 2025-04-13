@@ -1,0 +1,45 @@
+---
+- hosts: "{{host | default ('thelinux')}}"
+  vars_files: 
+    - /mnt/e/dev/apikeys/mqvariables.enc
+  vars:
+    srcdir: /mnt/e/dev/astronomy/allsky
+    destdir: "{{ ansible_env.HOME }}/src/tackley-tools"
+    logdir: "{{ ansible_env.HOME }}/logs"
+  tasks:
+  - name: Copy supporting files
+    copy: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }}
+    with_items:
+    - {src: '{{srcdir}}/checkAndAlert.sh', dest: '{{destdir}}/', mode: '755', backup: no }
+    - {src: '{{srcdir}}/sendAllskyAlert.py', dest: '{{destdir}}/', mode: '644', backup: no }
+    - {src: '{{srcdir}}/mqConfig.py', dest: '{{destdir}}/', mode: '644', backup: no }
+
+  - name: update LOGDIR in pythoncode
+    ansible.builtin.replace:
+      path: '{{destdir}}/sendAllskyAlert.py'
+      regexp: "LOGDIR"
+      replace: "{{ logdir }}"
+
+  - name: update MQ broker
+    ansible.builtin.replace:
+      path: '{{destdir}}/mqConfig.py'
+      regexp: "someserver.net"
+      replace: "wxsatpi"
+
+  - name: update mquser
+    ansible.builtin.replace:
+      path: '{{destdir}}/mqConfig.py'
+      regexp: "mquser"
+      replace: "sensors"
+
+  - name: update mqpass
+    ansible.builtin.replace:
+      path: '{{destdir}}/mqConfig.py'
+      regexp: "mqpass"
+      replace: "{{ mqsenspassword }}"
+
+  - name: update mqport 
+    ansible.builtin.replace:
+      path: '{{destdir}}/mqConfig.py'
+      regexp: "1883"
+      replace: "1883"

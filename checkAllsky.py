@@ -19,7 +19,7 @@ if __name__ == '__main__':
     log.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-    fh = RotatingFileHandler(os.path.expanduser('LOGDIR/checkAllsky.log'), maxBytes=51200, backupCount=10)
+    fh = RotatingFileHandler(os.path.expanduser('LOGDIR/checkAllsky.log'), maxBytes=512000, backupCount=10)
     fh.setLevel(logging.INFO)
     fh.setFormatter(formatter)
     log.addHandler(fh)
@@ -34,13 +34,18 @@ if __name__ == '__main__':
         log.info('checking')
         status = 1
         loglines = open(logfile, 'r').readlines()
-        lastline = loglines[-1][:15]
-        lastdt = datetime.datetime.strptime(lastline, '%b %d %H:%M:%S')
-        stalled = (datetime.datetime.now()-lastdt).seconds > MAXDELAY
-        if stalled:
-            log.info('stuck, alerting operator')
-            if stalled:
+        try:
+            lastline = loglines[-1]
+            prevline = loglines[-2]
+            
+            lastdt = datetime.datetime.strptime(lastline[:15], '%b %d %H:%M:%S')
+            delay = (datetime.datetime.now()-lastdt).seconds 
+            if 'Unable to' in lastline or 'Unable to' in prevline or delay > MAXDELAY:
+                stalled = True
+                log.info('stuck, alerting operator')
                 status = 0
+        except Exception:  
+            pass
         sendStatusUpdate(status, datetime.datetime.now())
             
         if os.path.isfile(stopfile):

@@ -54,7 +54,6 @@
       path: '{{destdir}}/checkallsky.service'
       regexp: "SRCDIR"
       replace: " {{ destdir }}"
-
   - name: install cronjobs and python modules
     shell: source ~/vAllsky/bin/activate && {{destdir}}/install.sh
     args:

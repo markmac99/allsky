@@ -83,9 +83,9 @@ def sendStatusUpdate(status, stsdate, localcfg=None):
         client.username_pw_set(localcfg['mqtt']['username'], localcfg['mqtt']['password'])
     client.connect(broker, 1883, 60)
     topic = f'meteorcams/{hname}/last_update'
-    ret = client.publish(topic, payload=stsdate.strftime('%Y-%m-%dT%H:%M:%SZ'), qos=0, retain=False)
+    ret = client.publish(topic, payload=stsdate.strftime('%Y-%m-%dT%H:%M:%SZ'), qos=0, retain=True)
     topic = f'meteorcams/{hname}/status'
-    ret = client.publish(topic, payload=status, qos=0, retain=False)
+    ret = client.publish(topic, payload=status, qos=0, retain=True)
     return ret
 
 
