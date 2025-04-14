@@ -12,7 +12,6 @@
     with_items:
     - {src: '{{srcdir}}/checkAndAlert.sh', dest: '{{destdir}}/', mode: '755', backup: no }
     - {src: '{{srcdir}}/sendAllskyAlert.py', dest: '{{destdir}}/', mode: '644', backup: no }
-    - {src: '{{srcdir}}/mqConfig.py', dest: '{{destdir}}/', mode: '644', backup: no }
 
   - name: update LOGDIR in pythoncode
     ansible.builtin.replace:
@@ -22,24 +21,18 @@
 
   - name: update MQ broker
     ansible.builtin.replace:
-      path: '{{destdir}}/mqConfig.py'
-      regexp: "someserver.net"
+      path: '{{destdir}}/checkAndAlert.sh'
+      regexp: "broker"
       replace: "wxsatpi"
 
   - name: update mquser
     ansible.builtin.replace:
-      path: '{{destdir}}/mqConfig.py'
+      path: '{{destdir}}/checkAndAlert.sh'
       regexp: "mquser"
       replace: "sensors"
 
   - name: update mqpass
     ansible.builtin.replace:
-      path: '{{destdir}}/mqConfig.py'
+      path: '{{destdir}}/checkAndAlert.sh'
       regexp: "mqpass"
       replace: "{{ mqsenspassword }}"
-
-  - name: update mqport 
-    ansible.builtin.replace:
-      path: '{{destdir}}/mqConfig.py'
-      regexp: "1883"
-      replace: "1883"
