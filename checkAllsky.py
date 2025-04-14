@@ -6,6 +6,7 @@ import datetime
 import time
 import logging
 from logging.handlers import RotatingFileHandler
+from random import randint
 
 from sendToMQTT import sendStatusUpdate
 
@@ -46,6 +47,8 @@ if __name__ == '__main__':
                 status = 0
         except Exception:  
             pass
+        # add some randomness to ensure that OpenHab logs the values.
+        status = status + (randint(0,9)/1000.0)
         sendStatusUpdate(status, datetime.datetime.now())
             
         if os.path.isfile(stopfile):
