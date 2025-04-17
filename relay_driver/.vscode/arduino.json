@@ -1,0 +1,17 @@
+{
+  "port": "COM10",
+  "configuration": "cpu=atmega328old",
+  "output": "build",
+  "board": "arduino:avr:nano",
+  "programmer": "",
+  "useProgrammer": false,
+  "configurationRequired": true,
+  "monitorPortSettings": {
+    "port": "COM10",
+    "baudRate": 9600,
+    "lineEnding": "\r\n",
+    "dataBits": 8,
+    "parity": "none",
+    "stopBits": "one"
+  }
+}
