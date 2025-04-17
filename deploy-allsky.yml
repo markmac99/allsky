@@ -39,17 +39,17 @@
       path: '{{destdir}}/config.ini'
       regexp: 'PASSWORD='
       line: 'PASSWORD={{ rmscampassword }}'
-  - name: update LOGDIR
+  - name: update LOGDIR in config
+    lineinfile:
+      path: '{{destdir}}/config.ini'
+      regexp: "LOGDIR="
+      line: 'LOGDIR={{ logdir }}'
+  - name: update LOGDIR in service file
     ansible.builtin.replace:
       path: '{{destdir}}/checkallsky.service'
       regexp: "LOGDIR"
       replace: "{{ logdir }}"
-  - name: update LOGDIR in pythoncode
-    ansible.builtin.replace:
-      path: '{{destdir}}/checkAllsky.py'
-      regexp: "LOGDIR"
-      replace: "{{ logdir }}"
-  - name: update SRCDIR
+  - name: update SRCDIR in service file
     ansible.builtin.replace:
       path: '{{destdir}}/checkallsky.service'
       regexp: "SRCDIR"
