@@ -64,7 +64,7 @@ if __name__ == '__main__':
         # add some randomness to ensure that OpenHab logs the values.
         status = status + (randint(0,9)/1000.0)
         sendStatusUpdate(status, datetime.datetime.now())
-        if status == 0:
+        if status < 0.5:
             GPIO.output(triggerpin, GPIO.HIGH)
             log.info('rebooting')
             os.system('sudo shutdown -h now')
