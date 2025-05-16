@@ -8,6 +8,7 @@ from time import sleep
 from crontab import CronTab
 import ephem
 import socket
+import requests
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -24,7 +25,10 @@ def uploadToYoutube(here, title, fname):
     # set to 1 to disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+    # workaround for slow or failing to resolve ipv6 addresses
     socket.setdefaulttimeout(60)
+    requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
     api_service_name = 'youtube'
     api_version = 'v3'
