@@ -9,6 +9,21 @@ srcdir="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $srcdir
 source ~/vAllsky/bin/activate
 
-ping -c 1 www.googleapis.com # ensure the URL is in the DNS cache
+apiserver=www.googleapis.com
+failed=1
+loop=0
+while [ $failed != 0 ] ; do 
+    ping -4 -c 2 -W 10 -w 30 $apiserver # ensure the v4 address is in the DNS cache
+    ping -6 -c 2 -W 10 -w 30 $apiserver # ensure the v6 address is in the DNS cache
+    failed=$?
+    loop=$((loop+1))
+    if [ $loop -gt 30 ] ; then 
+        echo "failed to find the api server"
+        failed=0
+    else
+        if [ $failed == 0 ]; then 
+            python $srcdir/ytUpload.py /var/log/allsky.log $HOME/allsky
+        fi
+    fi
+done
 
-python $srcdir/ytUpload.py /var/log/allsky.log $HOME/allsky
