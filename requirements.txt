@@ -9,4 +9,4 @@ google_auth_oauthlib
 ephem
 paramiko
 # used to force-reboot if allsky is stuck
-RPi.GPIO
+RPi.GPIO ; sys_platform !="win32"
