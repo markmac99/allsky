@@ -36,6 +36,7 @@ def updateSentList(here, fname):
     sentlist = [x.strip() for x in sentlist]
     sentlist.append(fname)
     sentlist = list(set(sentlist))  
+    sentlist.sort()
     open(os.path.join(here, 'ytdone.txt'), 'w').writelines([x + '\n' for x in sentlist])
     return
 
