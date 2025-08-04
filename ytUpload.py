@@ -144,15 +144,19 @@ def updateCrontab(here, logdir, offset=30, lati=51.88, longi=-1.31, elev=80):
             cron.remove(job)
             cron.write()
     job = cron.new(f'{here}/youtubeUploader.sh > {logdir}/checkYtConn.log 2>&1')
-    job.setall('*/5', hourstr, '*', '*', '*')
+    job.setall('*/15', hourstr, '*', '*', '*')
     cron.write()
     return
 
 
 if __name__ == "__main__":
     today = datetime.datetime.now()
+    inprogressfn = '/tmp/ytinprogress'
+    if os.path.isfile(inprogressfn):
+        print('already running')
+        exit(0)
+    open(inprogressfn,'w').write('1\n')
     here = os.path.split(os.path.abspath(__file__))[0]
-    logfile = sys.argv[1] # not actually used any more
 
     localcfg = configparser.ConfigParser()
     localcfg.read(os.path.join(here, 'config.ini'))
@@ -185,3 +189,7 @@ if __name__ == "__main__":
         if ret:
             sleep(60)
     updateCrontab(here, logdir)
+    try:
+        os.remove(inprogressfn)
+    except:
+        print('!!! Unable to remove flag file')
