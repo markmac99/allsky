@@ -27,6 +27,13 @@ log = logging.getLogger('ytUpload')
 
 
 def updateSentList(here, fname):
+    """
+    update the list of sent files
+    parameters:
+        here [string]:      current working directory
+        fname [string]:     full path to the mp4 video    
+    """
+
     # reads the list and strip newlines, appends the new entry, 
     # then makes sure the list is unique and writes it back with newlines
     if os.path.isfile(os.path.join(here, 'ytdone.txt')):
@@ -42,7 +49,12 @@ def updateSentList(here, fname):
 
 
 def checkIfSent(here, fname):
-    # to avoid sending the same video twice
+    """
+    check to avoid sending the same video twice
+    parameters:
+        here [string]:      current working directory
+        fname [string]:     full path to the mp4 video    
+    """
     sentlist = open(os.path.join(here, 'ytdone.txt'), 'r').readlines()
     sentlist = [x.strip() for x in sentlist]
     if fname in sentlist:
@@ -51,6 +63,14 @@ def checkIfSent(here, fname):
     
 
 def uploadToYoutube(here, title, fname, forceUpload=False):
+    """
+    Upload video to youtube
+    parameters:
+        here [string]:      current working directory
+        title [string]:     title for youtube
+        fname [string]:     full path to the mp4 video
+        forceupload [bool]: force upload even if already done. Default False
+    """
     # set to 1 to disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -128,6 +148,17 @@ def uploadToYoutube(here, title, fname, forceUpload=False):
 
 
 def updateCrontab(here, logdir, offset=30, lati=51.88, longi=-1.31, elev=80):
+    """
+    Add a cron job to run this script every 15 minutes for a three hour period around dawn
+    parameters:
+        here [string]:      current working directory
+        logdir [strin]:     where to write logfiles
+        offset [int]:       how long after dawn to start running
+        lati [float]:       ovservers latitude
+        longi [float]:      ovservers longitude
+        elev [float]:       ovservers elevation above sea level
+
+    """
     obs = ephem.Observer()
     obs.lat = float(lati) / 57.3 # convert to radians, close enough for this
     obs.lon = float(longi) / 57.3
@@ -149,7 +180,37 @@ def updateCrontab(here, logdir, offset=30, lati=51.88, longi=-1.31, elev=80):
     return
 
 
+def mp4Ready(logfile, mp4name):
+    """ 
+    Search the last couple of allsky.log files to make sure the mp4 is ready to upload
+    parameters:
+        logfile [string]:   the full path to the allsky.log file
+        mp4name [string]:   bare name of the video to check for eg allsky-20240101.mp4
+    """
+    srchtext = f'{mp4name} success'
+    llines = open(logfile, 'r').readlines()
+    for li in llines:
+        if srchtext in li:
+            return True
+    llines = open(f'{logfile}.1', 'r').readlines()
+    for li in llines:
+        if srchtext in li:
+            return True
+    llines = open(f'{logfile}.2', 'r').readlines()
+    for li in llines:
+        if srchtext in li:
+            return True
+    return False
+
+
 if __name__ == "__main__":
+    """
+    Upload allsky videos to youtube
+    Arguments:
+        logfile:    full path to allsky.log
+        allskyhome: full path to the folder containing the allsky software eg $HOME/allsky
+        forceupload: if present, uploads will be forced through
+    """
     today = datetime.datetime.now()
     inprogressfn = '/tmp/ytinprogress'
     if os.path.isfile(inprogressfn):
@@ -169,6 +230,7 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     log.addHandler(fh)
 
+    logfile = sys.argv[1]
     allskyhome = sys.argv[2]
     forceUpload = False
     if len(sys.argv) > 3:
@@ -180,7 +242,11 @@ if __name__ == "__main__":
     allmp4s = list(set(allmp4s))
     allmp4s.sort()
     for fname in allmp4s:
-        filedate = os.path.split(fname)[1].split('-')[1][:8]
+        mp4name = os.path.split(fname)[1]
+        if not mp4Ready(logfile, mp4name) and forceUpload is False:
+            log.info(f'{mp4name} not ready for upload')
+            continue
+        filedate = mp4name.split('-')[1][:8]
         yy = filedate[:4]
         mm = filedate[4:6]
         dd = filedate[6:]
@@ -192,4 +258,4 @@ if __name__ == "__main__":
     try:
         os.remove(inprogressfn)
     except:
-        print('!!! Unable to remove flag file')
+        log.warning('!!! Unable to remove flag file')
