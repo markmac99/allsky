@@ -210,12 +210,17 @@ if __name__ == "__main__":
         logfile:    full path to allsky.log
         allskyhome: full path to the folder containing the allsky software eg $HOME/allsky
         forceupload: if present, uploads will be forced through
-    """
-    today = datetime.datetime.now()
+    """    
+    today = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
     inprogressfn = '/tmp/ytinprogress'
+    # if the file is more than a couple of hours old the previous upload failed
+    fmtime = os.path.getmtime(inprogressfn)
+    if (today - fmtime)/3600 > 2:
+        os.remove(inprogressfn)
     if os.path.isfile(inprogressfn):
         print('already running')
         exit(0)
+
     open(inprogressfn,'w').write('1\n')
     here = os.path.split(os.path.abspath(__file__))[0]
 
