@@ -1,9 +1,9 @@
 ---
 - hosts: "{{host | default ('thelinux')}}"
   vars_files: 
-    - /mnt/e/dev/apikeys/mqvariables.enc
+    - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: /mnt/e/dev/astronomy/allsky
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/tackley/allsky"
     destdir: "{{ ansible_env.HOME }}/src/tackley-tools"
     logdir: "{{ ansible_env.HOME }}/logs"
   tasks:

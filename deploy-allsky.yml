@@ -3,7 +3,7 @@
   vars_files: 
     - /mnt/c/Users/{{ lookup('env','USER' )}}/apikeys/mqvariables.enc
   vars:
-    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/allsky"
+    srcdir: "/mnt/c/Users/{{ lookup('env','USER' )}}/OneDrive/dev/tackley/allsky"
     destdir: "{{ ansible_env.HOME }}/src/tackley-tools"
     allskydir: "{{ ansible_env.HOME }}/allsky"
     logdir: "{{ ansible_env.HOME }}/logs"
@@ -23,6 +23,22 @@
     - {src: '{{srcdir}}/ytUpload.py', dest: '{{destdir}}/', mode: '644', backup: no }
     - {src: '{{srcdir}}/upload.sh', dest: '{{allskydir}}/scripts/', mode: '755', backup: no }
 
+    - name: update mqtt broker
+    lineinfile: 
+      path: '{{destdir}}/config.ini'
+      regexp: 'BROKER='
+      line: 'BROKER=metsatpi'
+  - name: update MQTT username
+    lineinfile:
+      path: '{{destdir}}/config.ini'
+      regexp: 'USERNAME='
+      line: 'USERNAME=rmscams'
+  - name: update MQTT password
+    lineinfile:
+      path: '{{destdir}}/config.ini'
+      regexp: 'PASSWORD='
+      line: 'PASSWORD={{ rmscampassword }}'
+  
   - name: update LOGDIR in config
     lineinfile:
       path: '{{destdir}}/config.ini'
