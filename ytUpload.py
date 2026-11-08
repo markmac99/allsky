@@ -183,9 +183,13 @@ def updateCrontab(here, logdir, offset=30, lati=51.88, longi=-1.31, elev=80):
 def mp4Ready(logfile, mp4name):
     """ 
     Search the last couple of allsky.log files to make sure the mp4 is ready to upload
-    parameters:
+    Arguments:
         logfile [string]:   the full path to the allsky.log file
         mp4name [string]:   bare name of the video to check for eg allsky-20240101.mp4
+
+    Returns:
+        False if the file is not found in the logfiles, true if it is. 
+        Note: Will return False if the file is too old to be in the uncompressed logs. This is expected. 
     """
     srchtext = f'{mp4name} success'
     llines = open(logfile, 'r').readlines()
@@ -196,10 +200,11 @@ def mp4Ready(logfile, mp4name):
     for li in llines:
         if srchtext in li:
             return True
-    llines = open(f'{logfile}.2', 'r').readlines()
-    for li in llines:
-        if srchtext in li:
-            return True
+    if os.path.isfile(f'{logfile}.2'):
+        llines = open(f'{logfile}.2', 'r').readlines()
+        for li in llines:
+            if srchtext in li:
+                return True
     return False
 
 
