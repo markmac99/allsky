@@ -23,7 +23,7 @@
     - {src: '{{srcdir}}/ytUpload.py', dest: '{{destdir}}/', mode: '644', backup: no }
     - {src: '{{srcdir}}/upload.sh', dest: '{{allskydir}}/scripts/', mode: '755', backup: no }
 
-    - name: update mqtt broker
+  - name: update mqtt broker
     lineinfile: 
       path: '{{destdir}}/config.ini'
       regexp: 'BROKER='

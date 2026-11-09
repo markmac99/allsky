@@ -13,6 +13,7 @@ import glob
 import logging
 from logging.handlers import RotatingFileHandler
 import configparser
+import argparse
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -216,19 +217,22 @@ if __name__ == "__main__":
         allskyhome: full path to the folder containing the allsky software eg $HOME/allsky
         forceupload: if present, uploads will be forced through
     """    
-    today = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
-    inprogressfn = '/tmp/ytinprogress'
-    # if the file is more than a couple of hours old the previous upload failed
-    fmtime = os.path.getmtime(inprogressfn)
-    if (today - fmtime)/3600 > 2:
-        os.remove(inprogressfn)
-    if os.path.isfile(inprogressfn):
-        print('already running')
-        exit(0)
+    # parse the arguments
+    arg_parser = argparse.ArgumentParser(description='Upload allsky video to youtube')
+    arg_parser.add_argument('log_file', metavar='LOG_FILE', type=str, help='Full name of the allsky log')
+    arg_parser.add_argument('allsky_home', metavar='ALLSKY_HOME', type=str, help='Path to the allsky codebase')
+    arg_parser.add_argument('-f', '--force', action="store_true", help="force upload of latest file")
+    cml_args = arg_parser.parse_args()
 
-    open(inprogressfn,'w').write('1\n')
+    logfile = cml_args.log_file
+    allskyhome = cml_args.allsky_home
+
+    forceUpload = False
+    if cml_args.force:
+        forceUpload = True
+
+    # set up logging
     here = os.path.split(os.path.abspath(__file__))[0]
-
     localcfg = configparser.ConfigParser()
     localcfg.read(os.path.join(here, 'config.ini'))
     logdir = localcfg['checking']['logdir']
@@ -240,11 +244,18 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     log.addHandler(fh)
 
-    logfile = sys.argv[1]
-    allskyhome = sys.argv[2]
-    forceUpload = False
-    if len(sys.argv) > 3:
-        forceUpload = True
+    # check if already running
+    # if the file is more than a couple of hours old the previous upload failed
+    today = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+    inprogressfn = os.path.join(os.getenv('TMP', default='/tmp'),'ytinprogress')
+    if os.path.isfile(inprogressfn):
+        fmtime = os.path.getmtime(inprogressfn)
+        if (today - fmtime)/3600 < 2:
+            log.info('script already in progress, not rerunning')
+            exit(0)
+        else:
+            log.info('in progress flag stale, continuing anyway')
+    open(inprogressfn,'w').write('1\n')
 
     log.info('======================')
     log.info(f'checking for new mp4s at {datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}')
@@ -261,9 +272,13 @@ if __name__ == "__main__":
         mm = filedate[4:6]
         dd = filedate[6:]
         title = f'Allsky timelapse for {yy}-{mm}-{dd}'
-        ret = uploadToYoutube(here, title, fname, forceUpload)
-        if ret:
-            sleep(60)
+        try:
+            ret = uploadToYoutube(here, title, fname, forceUpload)
+            if ret:
+                sleep(60)
+        except Exception as e:
+            log.warning('upload failed')
+            log.warning(e)
     updateCrontab(here, logdir)
     try:
         os.remove(inprogressfn)
