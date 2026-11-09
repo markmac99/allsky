@@ -123,29 +123,32 @@ def uploadToYoutube(here, title, fname, forceUpload=False):
             "status": {
                 "privacyStatus": "public"
             }
-        },
-        
+        },    
         media_body=MediaFileUpload(fname, chunksize=-1, resumable=True)
     )
-    try: 
-        status,response = request.next_chunk() # request.execute()
-        log.debug(status)
-        if response is not None:
-            if 'id' in response:
-                log.info(f'Video id  {response["id"]} was successfully uploaded.')
-                ret = True
-                updateSentList(here, fname)
+    ret = False
+    retries = 10
+    for i in range(retries):
+        try: 
+            status,response = request.next_chunk() 
+            if response is not None:
+                if 'id' in response:
+                    log.info(f'Video id  {response["id"]} was successfully uploaded.')
+                    ret = True
+                    updateSentList(here, fname)
+                    break
+                else:
+                    log.debug(f'The upload failed with an unexpected response: {response}')
             else:
-                log.debug(f'The upload failed with an unexpected response: {response}')
-                ret = False
-    except HttpError as e:
-        log.debug(f'HTTP error {e.resp.status} arose with message: {e.content}')
-        ret = False
-    socket.setdefaulttimeout(None)
-    if ret is False:
-        log.info('waiting a minute before trying again')
+                log.warning(f'Upload problem: status was {status} ')
+        except HttpError as e:
+            log.debug(f'HTTP error {e.resp.status} arose with message: {e.content}')
+        log.warning(f'retrying in 60s - retry {i+1} of {retries}')
         sleep(60)
-    return ret 
+    socket.setdefaulttimeout(None)
+    if not ret:
+        log.warning(f'sending of {fname} failed after ten attempts')
+    return ret
 
 
 def updateCrontab(here, logdir, offset=30, lati=51.88, longi=-1.31, elev=80):
@@ -272,13 +275,7 @@ if __name__ == "__main__":
         mm = filedate[4:6]
         dd = filedate[6:]
         title = f'Allsky timelapse for {yy}-{mm}-{dd}'
-        try:
-            ret = uploadToYoutube(here, title, fname, forceUpload)
-            if ret:
-                sleep(60)
-        except Exception as e:
-            log.warning('upload failed')
-            log.warning(e)
+        ret = uploadToYoutube(here, title, fname, forceUpload)
     updateCrontab(here, logdir)
     try:
         os.remove(inprogressfn)
