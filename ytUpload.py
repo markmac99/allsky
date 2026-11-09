@@ -22,6 +22,10 @@ from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
 from googleapiclient.errors import HttpError
 
+# inadvisable but silences annoying warning from googles apis
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 scopes = ["https://www.googleapis.com/auth/youtube.upload"]
 
 log = logging.getLogger('ytUpload')
