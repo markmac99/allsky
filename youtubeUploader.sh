@@ -14,10 +14,12 @@ oauthserver=oauth2.googleapis.com
 failed=1
 loop=0
 while [ $failed != 0 ] ; do 
-    ping -4 -c 2 -W 10 -w 30 $oauthserver # ensure the v4 address is in the DNS cache
-#    ping -6 -c 2 -W 10 -w 30 $oauthserver 
-    ping -4 -c 2 -W 10 -w 30 $apiserver 
-#    ping -6 -c 2 -W 10 -w 30 $apiserver 
+    # ensure the v4 addresses are in the DNS cache
+    ping -4 -c 2 -W 10 -w 30 $oauthserver > /dev/null 2>&1
+    ping -4 -c 2 -W 10 -w 30 $apiserver > /dev/null 2>&1
+    # do the same for v6 - this stopped working 
+#    ping -6 -c 2 -W 10 -w 30 $oauthserver > /dev/null 2>&1
+#    ping -6 -c 2 -W 10 -w 30 $apiserver > /dev/null 2>&1
     failed=$?
     loop=$((loop+1))
     if [ $loop -gt 30 ] ; then 

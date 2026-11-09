@@ -15,16 +15,16 @@ from logging.handlers import RotatingFileHandler
 import configparser
 import argparse
 
+# inadvisable but silences annoying warning from googles apis
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
 from googleapiclient.http import MediaFileUpload
 from google.auth.transport.requests import Request
 from googleapiclient.errors import HttpError
-
-# inadvisable but silences annoying warning from googles apis
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
 
 scopes = ["https://www.googleapis.com/auth/youtube.upload"]
 
@@ -250,6 +250,12 @@ if __name__ == "__main__":
     fh.setLevel(logging.INFO)
     fh.setFormatter(formatter)
     log.addHandler(fh)
+
+    # Init the console handler (i.e. print to console)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    log.addHandler(console_handler)
+
 
     # check if already running
     # if the file is more than a couple of hours old the previous upload failed
