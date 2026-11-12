@@ -258,12 +258,12 @@ if __name__ == "__main__":
 
 
     # check if already running
-    # if the file is more than a couple of hours old the previous upload failed
+    # if the file is stale then the previous upload failed
     today = datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
     inprogressfn = os.path.join(os.getenv('TMP', default='/tmp'),'ytinprogress')
     if os.path.isfile(inprogressfn):
         fmtime = os.path.getmtime(inprogressfn)
-        if (today - fmtime)/3600 < 2:
+        if (today - fmtime)/3600.0 <0.5:
             log.info('script already in progress, not rerunning')
             exit(0)
         else:
